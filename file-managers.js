@@ -35,7 +35,7 @@ function setImageIndexMode(mode) {
     imageIndexMode = mode;
 }
 function getFile(path,type,isCustom=true) {
-    let engineSector = isCustom ? customSector : "elven-engine";
+    let engineSector = isCustom ? customSector : "../elven-engine";
     switch(type) {
         case FileTypes.None:
         default:
