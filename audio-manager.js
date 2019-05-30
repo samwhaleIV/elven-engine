@@ -110,6 +110,13 @@ function fadeOutSongs(musicFadeOutDuration,callback) {
     },musicFadeOutDuration);
 }
 
+let lastIntroID = 0;
+function getNextIntroID() {
+    return lastIntroID++;
+}
+
+let activeLoops = {};
+
 function playMusicWithIntro(loopName,introName,withLoop=true) {
     const introBuffer = audioBuffers[introName];
     const loopBuffer = audioBuffers[loopName];
@@ -125,6 +132,9 @@ function playMusicWithIntro(loopName,introName,withLoop=true) {
         }
         musicNode.buffer = introBuffer;
         musicNode.loop = false;
+        const loopID = getNextIntroID();
+        activeLoops[loopID] = true;
+        musicNode.loopID = loopID;
 
         musicNode.volumeControl = audioContext.createGain();
         if(introMuteManifest[introName] && !introMuteManifest[introName].shouldPlay) {
@@ -137,8 +147,10 @@ function playMusicWithIntro(loopName,introName,withLoop=true) {
             startSyncTime = audioContext.currentTime + 0.01;
         }
 
+        const startedTime = performance.now();
+
         musicNode.onended = () => {
-            if(!musicNodes[introName]) {
+            if(!musicNodes[introName] || !activeLoops[loopID]) {
                 return;
             }
             const loopMusicNode = audioContext.createBufferSource();
@@ -161,8 +173,9 @@ function playMusicWithIntro(loopName,introName,withLoop=true) {
             }
             loopMusicNode.volumeControl.connect(musicOutputNode);
             loopMusicNode.connect(loopMusicNode.volumeControl);
-    
-            loopMusicNode.start(audioContext.currentTime + (audioContext.currentTime - loopSyncTime));
+
+            const loopStartTime = audioContext.currentTime + audioContext.currentTime - loopSyncTime;
+            loopMusicNode.start(loopStartTime);
             musicNodes[loopName] = loopMusicNode;
             deleteTrack(introName);
         }
@@ -171,7 +184,7 @@ function playMusicWithIntro(loopName,introName,withLoop=true) {
         if(audioContext.currentTime > startSyncTime) {
             musicNode.start(audioContext.currentTime,audioContext.currentTime-startSyncTime);
         } else {
-            musicNode.start(startSyncTime);
+            musicNode.start(startSyncTime,0,musicNode.buffer.length);
         }
         musicNodes[introName] = musicNode;
 
@@ -210,6 +223,7 @@ function playMusic(name,withLoop=true) {
 function deleteTrack(name) {
     console.log(`Audio manager: Deleted track '${name}'`);
     const node = musicNodes[name];
+    console.log(node);
     node.stop();
     node.volumeControl.disconnect(musicOutputNode);
     delete musicNodes[name];
@@ -221,6 +235,7 @@ function stopMusic() {
     }
     startSyncTime = null;
     loopSyncTime = null;
+    activeLoops = {};
     startSpeedManifest = {};
     introMuteManifest = {};
     loopMuteManifest = {};
