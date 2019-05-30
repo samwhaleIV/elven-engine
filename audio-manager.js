@@ -97,13 +97,15 @@ function unmuteTrack(name) {
 }
 
 function fadeOutSongs(musicFadeOutDuration,callback) {
-    const nodes = Object.values(musicNodes);
-    const endTime = audioContext.currentTime + (musicFadeOutDuration / 1000)
-    for(let i = 0;i<nodes.length;i++) {
-        nodes[i].volumeControl.gain.linearRampToValueAtTime(0,endTime);
+    clearMusicEnvironment();
+    const endTime = audioContext.currentTime + (musicFadeOutDuration / 1000);
+    for(let key in musicNodes) {
+        musicNodes[key].volumeControl.gain.linearRampToValueAtTime(0,endTime);
     }
     setTimeout(()=>{
-        stopMusic();
+        for(let key in musicNodes) {
+            deleteTrack(key);
+        }
         if(callback) {
             callback();
         }
@@ -223,16 +225,12 @@ function playMusic(name,withLoop=true) {
 function deleteTrack(name) {
     console.log(`Audio manager: Deleted track '${name}'`);
     const node = musicNodes[name];
-    console.log(node);
     node.stop();
     node.volumeControl.disconnect(musicOutputNode);
     delete musicNodes[name];
 }
 
-function stopMusic() {
-    for(let key in musicNodes) {
-        deleteTrack(key);
-    }
+function clearMusicEnvironment() {
     startSyncTime = null;
     loopSyncTime = null;
     activeLoops = {};
@@ -240,6 +238,13 @@ function stopMusic() {
     introMuteManifest = {};
     loopMuteManifest = {};
     startDetuneManifest = {};
+}
+
+function stopMusic() {
+    clearMusicEnvironment();
+    for(let key in musicNodes) {
+        deleteTrack(key);
+    }
 }
 
 function playSound(name,duration) {
