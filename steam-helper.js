@@ -1,11 +1,6 @@
-
 let steamworks = null;
 let steamworksLoaded = false;
 let suppressNullAchievements = true;
-
-function getDefeatAchievementName(index) {
-    return `ACH_DEFEAT_${index+1}`;
-}
 
 function setAchievement(ID) {
     if(steamworksLoaded) {

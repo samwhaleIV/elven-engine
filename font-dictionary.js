@@ -377,12 +377,5 @@ const fontDictionary = {
         0,0,0,
         1,1,1,
         0,0,0
-    ]},
-    "Z":{width:1,glyph:[
-        0,
-        0,
-        0,
-        0,
-        1
     ]}
 }
