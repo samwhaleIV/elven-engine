@@ -234,7 +234,6 @@ const processTextForWrapping = function(text) {
 
     return words;
 }
-
 const processTextForWrappingLookAhead = function(text,processedFullText) {
     return {
         sub: processTextForWrapping(text),
@@ -245,7 +244,6 @@ const textWrapTest = function(words,maxWidth,horizontalSpace,scale) {
     let xOffset = 0;
     const textSpacing = scale * 2;
     let i = 0;
-    let drawingCustomColor = false;
     let isNewLine = true;
     const wrapRequiredTable = new Array(words.length);
     while(i < words.length) {
@@ -255,12 +253,6 @@ const textWrapTest = function(words,maxWidth,horizontalSpace,scale) {
                 xOffset = 0;
                 wrapRequiredTable[i] = true;
                 isNewLine = true;
-            } else {
-                if(drawingCustomColor) {
-                    drawingCustomColor = false;
-                } else {
-                    drawingCustomColor = true;
-                }
             }
         } else {
             if(!isNewLine) {

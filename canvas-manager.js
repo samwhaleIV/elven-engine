@@ -507,7 +507,7 @@ function stopRenderer() {
 let didStartRenderer = false;
 function startRenderer() {
     if(!ENV_FLAGS.ALLOW_REPEAT_RENDER_START && didStartRenderer) {
-        throw Error("Canvas handler: Repeat renderer starts are disallowed your by your environment flags!");
+        throw Error("Canvas handler: Repeat renderer starts are disallowed by your environment flags!");
     }
     if(!rendererState) {
         console.error("Error: Missing renderer state; the renderer cannot start.");
