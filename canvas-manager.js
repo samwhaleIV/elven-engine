@@ -111,7 +111,7 @@ let pictureModeElementTimeout = null;
 
 let rendererState = null;
 let animationFrame = null;
-let paused = false;
+let paused = true;
 
 function getRelativeEventLocation(event) {
     return {
@@ -495,26 +495,34 @@ const render = (function(){
 })();
 
 function stopRenderer() {
+    console.warn("Warning: Stopping the renderer is deprecated for typical use cases. Use pause and resume methods instead");
     if(!rendererState) {
         console.warn("Warning: The renderer is already stopped and cannot be stopped further.");
         return;
     }
     window.cancelAnimationFrame(animationFrame);
-     rendererState = null;
+    rendererState = null;
     console.log("Renderer stopped");
 }
-
+let didStartRenderer = false;
 function startRenderer() {
-    paused = false;
+    if(!ENV_FLAGS.ALLOW_REPEAT_RENDER_START && didStartRenderer) {
+        throw Error("Canvas handler: Repeat renderer starts are disallowed your by your environment flags!");
+    }
     if(!rendererState) {
         console.error("Error: Missing renderer state; the renderer cannot start.");
         return;
+    }
+    paused = false;
+    didStartRenderer = true;
+    if(animationFrame) {
+        window.cancelAnimationFrame(animationFrame);
     }
     animationFrame = window.requestAnimationFrame(render);
     if(rendererState.start) {
         rendererState.start(performance.now());
     }
-    console.log("Canvas handler: Renderer started");
+    console.log("Canvas handler: Renderer started for the first time.");
 }
 
 function setRendererState(newRendererState) {
