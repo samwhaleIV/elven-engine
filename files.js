@@ -3,4 +3,6 @@ const EssentialSounds = [
     getFile("click.mp3",FileTypes.Sound,false)
 ];
 const NonEssentialSounds = [];
-const ImagePaths = [];
+const ImagePaths = [
+    getFile("elven-font.png",FileTypes.Image,false)
+];

@@ -67,24 +67,32 @@ const KEY_BINDS_KEY = "UV_KEY_BINDS";
 
 const textControlCodes = {
     "\n": /\n/g,
-    "R": /R/g,
-    "G": /G/g,
-    "B": /B/g,
-    "Y": /Y/g,
-    "P": /P/g,
-    "O": /P/g,
-    "X": /X/g
+    "ȸ": /ȸ/g,
+    "ȹ": /ȹ/g,
+    "ȴ": /ȴ/g,
+    "ȵ": /ȵ/g,
+    "ɇ": /ɇ/g,
+    "Ƚ": /Ƚ/g,
+    "ȿ": /ȿ/g,
+    "ɍ": /ɍ/g
 }
 const textColorLookup = {
-    "R": "red",
-    "G": "green",
-    "B": "blue",
-    "Y": "goldenrod",
-    "P": "blueviolet",
-    "O": "darkorange",
-    "Q": "deeppink",
-    "X": 0
+    "ȸ": "red",
+    "ȹ": "green",
+    "ȴ": "blue",
+    "ȵ": "goldenrod",
+    "ɇ": "blueviolet",
+    "Ƚ": "darkorange",
+    "ȿ": "deeppink",
+    "ɍ": 0
 }
+const inverseTextColorLookup = (function(){
+    const inverse = {};
+    Object.entries(textColorLookup).forEach(entry => {
+        inverse[entry[1]] = entry[0];
+    });
+    return inverse;
+})();
 const popupControlCharacters = {
     "-": true,
     " ": true,
