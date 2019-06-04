@@ -37,7 +37,7 @@ const BitmapList = [
     },
     {
         name: "J",
-        width: 5
+        width: 6
     },
     {
         name: "K",
@@ -256,8 +256,7 @@ const BitmapList = [
     },
     {
         name: ",",
-        width: 2,
-        extraSpace: 1
+        width: 2
     },
     {
         name: "\"",
@@ -313,13 +312,11 @@ const BitmapList = [
     },
     {
         name: ":",
-        width: 2,
-        extraSpace: 2
+        width: 2
     },
     {
         name: ";",
-        width: 2,
-        extraSpace: 2
+        width: 2
     },
     {
         //A beachigator was here :V

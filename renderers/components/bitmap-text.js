@@ -1,4 +1,8 @@
 const BitmapText = new (function(){
+
+    const letterSpacingFactor = 1;
+    const wordSpacingFactor = 6;
+
     let bitmap = null;
     let sourceHeight = null;
 
@@ -18,28 +22,28 @@ const BitmapText = new (function(){
         bitmap = imageDictionary["elven-font"];
         sourceHeight = bitmap.height / Object.keys(colorToRow).length;
     }
-    const textWrapTest = function(words,maxWidth,horizontalSpace,scale) {
+    const textWrapTest = function(words,maxWidth,scale) {
+        const horizontalSpace = scale * wordSpacingFactor;
+        const textSpacing = scale * letterSpacingFactor;
         let xOffset = 0;
-        const textSpacing = scale * 3.5;
         let i = 0;
         let isNewLine = true;
         const wrapRequiredTable = new Array(words.length);
-        while(i < words.length) {
+        while(i<words.length) {
             const word = words[i];
             if(textControlCodes[word]) {
                 if(word === "\n") {
-                    xOffset = 0;
                     wrapRequiredTable[i] = true;
+                    xOffset = 0;
                     isNewLine = true;
                 }
             } else {
-                if(!isNewLine) {
-                    xOffset += textSpacing;
-                } else {
+                if(isNewLine) {
                     isNewLine = false;
                 }
                 let wordTestWidth = 0;
                 let i2 = 0;
+    
                 while(i2 < word.length) {
                     const character = BitmapManifest[word[i2]];
                     wordTestWidth += character.width;
@@ -49,33 +53,24 @@ const BitmapText = new (function(){
                     i2++;
                 }
                 wordTestWidth *= scale;
-                if(xOffset + wordTestWidth >= maxWidth) {
-                    xOffset = 0;
+                wordTestWidth += word.length * textSpacing;
+
+                xOffset += wordTestWidth;
+    
+                if(xOffset >= maxWidth) {
                     wrapRequiredTable[i] = true;
+                    xOffset = 0;
                 }
-                i2 = 0;
-                while(i2 < word.length) {
-                    const character = BitmapManifest[word[i2]];
-                    const drawWidth = character.width * scale;
-                    xOffset += drawWidth;
-                    if(character.extraSpace) {
-                        xOffset += character.extraSpace * scale;
-                    }
-                    if(i2 < word.length-1) {
-                        xOffset += horizontalSpace;
-                    }
-                    i2++;
+                if(xOffset) {
+                    xOffset += horizontalSpace;
                 }
-            }
-            if(xOffset) {
-                xOffset += horizontalSpace;
             }
             i++;
         }
         return wrapRequiredTable;
     }
-    const drawTextWrappingLookAhead = function(processedText,x,y,maxWidth,horizontalSpace,verticalSpace,scale,color) {
-        const wrapRequiredTable = textWrapTest(processedText.full,maxWidth,horizontalSpace,scale);
+    const drawTextWrappingLookAhead = function(processedText,x,y,maxWidth,scale,color) {
+        const wrapRequiredTable = textWrapTest(processedText.full,maxWidth,scale);
         const wordsAdjusted = [processedText.sub[0]];
         for(let i = 1;i<processedText.sub.length;i++) {
             const newLine = wrapRequiredTable[i];
@@ -89,18 +84,18 @@ const BitmapText = new (function(){
                 wordsAdjusted.push(subWord);
             }
         }
-        drawTextWrapping(wordsAdjusted,x,y,maxWidth,horizontalSpace,verticalSpace,scale,color);
+        drawTextWrapping(wordsAdjusted,x,y,maxWidth,scale,color);
     }
-    function drawTextWrapping(words,x,y,maxWidth,horizontalSpace,verticalSpace,scale,color) {
+    function drawTextWrapping(words,x,y,maxWidth,scale,color) {
+        const horizontalSpace = scale * wordSpacingFactor;
+        const textSpacing = scale * letterSpacingFactor;
         let xOffset = 0;
         let yOffset = 0;
 
         let baseColorRow = colorToRow[color];
         let colorRow = baseColorRow;
 
-        const drawHeight = sourceHeight * scale;
-        const textSpacing = scale * 3.5;
-
+        const drawHeight = (sourceHeight+1) * scale;
         let i = 0;
         context.fillStyle = color;
         let drawingCustomColor = false;
@@ -110,7 +105,7 @@ const BitmapText = new (function(){
             if(textControlCodes[word]) {
                 if(word === "\n") {
                     xOffset = 0;
-                    yOffset += verticalSpace + drawHeight;
+                    yOffset += drawHeight;
                     isNewLine = true;
                 } else {
                     if(drawingCustomColor) {
@@ -122,9 +117,7 @@ const BitmapText = new (function(){
                     }
                 }
             } else {
-                if(!isNewLine) {
-                    xOffset += textSpacing;
-                } else {
+                if(isNewLine) {
                     isNewLine = false;
                 }
                 let wordTestWidth = 0;
@@ -139,10 +132,11 @@ const BitmapText = new (function(){
                     i2++;
                 }
                 wordTestWidth *= scale;
+                wordTestWidth += word.length * textSpacing;
     
                 if(xOffset + wordTestWidth >= maxWidth) {
                     xOffset = 0;
-                    yOffset += verticalSpace + drawHeight;
+                    yOffset += drawHeight;
                 }
         
                 i2 = 0;
@@ -152,29 +146,30 @@ const BitmapText = new (function(){
 
                     context.drawImage(
                         bitmap,character.x,colorRow*sourceHeight,character.width,sourceHeight,
-                        x+xOffset,y+yOffset,character.width*scale,drawHeight
+                        x+xOffset,y+yOffset,drawWidth,drawHeight
                     );
-                    
+
                     xOffset += drawWidth;
+
                     if(character.extraSpace) {
                         xOffset += character.extraSpace * scale;
                     }
                     if(i2 < word.length-1) {
-                        xOffset += horizontalSpace;
+                        xOffset += textSpacing;
                     }
                     i2++;
                 }
-            }
-            if(xOffset) {
-                xOffset += horizontalSpace;
+                if(xOffset) {
+                    xOffset += horizontalSpace;
+                }
             }
             i++;
         }
     }
-    this.drawTextWrappingLookAheadWhite = (processedText,x,y,maxWidth,horizontalSpace,verticalSpace,scale) => {
-        drawTextWrappingLookAhead(processedText,x,y,maxWidth,horizontalSpace,verticalSpace,scale,"white");
+    this.drawTextWrappingLookAheadWhite = (processedText,x,y,maxWidth,scale) => {
+        drawTextWrappingLookAhead(processedText,x,y,maxWidth,scale,"white");
     }
-    this.drawTextWrappingLookAheadBlack = (processedText,x,y,maxWidth,horizontalSpace,verticalSpace,scale) => {
-        drawTextWrappingLookAhead(processedText,x,y,maxWidth,horizontalSpace,verticalSpace,scale,"black");
+    this.drawTextWrappingLookAheadBlack = (processedText,x,y,maxWidth,scale) => {
+        drawTextWrappingLookAhead(processedText,x,y,maxWidth,scale,"black");
     }
 })();
