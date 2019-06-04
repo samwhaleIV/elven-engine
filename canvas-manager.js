@@ -363,7 +363,7 @@ function applySizeMode(forced=false) {
             (
                 window.innerWidth / window.innerHeight > maximumWidthToHeightRatio ||
                 window.innerHeight / window.innerWidth > maximumHeightToWidthRatio
-            ) && !rendererState.disableAdapativeFill
+            ) && !rendererState.disableAdaptiveFill
         ) {
             sizeMode = sizeModes.fit.name;
         }
@@ -392,17 +392,23 @@ function applySizeMode(forced=false) {
                 break;
             default:
             case sizeModes.stretch.name:
-                let zoomDivider = rendererState ? rendererState.zoomDivider || defaultFullScreenZoom : defaultFullScreenZoom;
-                if(window.innerWidth >= maxHorizontalResolution) {
-                    zoomDivider = (window.innerWidth / maxHorizontalResolution) * defaultFullScreenZoom;
-                    applyHighResolutionTextAdaptions();
-                } else if(window.innerWidth < smallScaleSnapPoint) {
-                    zoomDivider = smallFullScreenZoom;
-                    applyLowResolutionTextAdapations();
-                } else if(window.innerWidth < mediumScaleSnapPoint) {
-                    zoomDivider = mediumFullScreenZoom;
-                    applyMediumResolutionTextAdapations();
+                let zoomDivider;
+                if(!rendererState.noScale) {
+                    zoomDivider = rendererState ? rendererState.zoomDivider || defaultFullScreenZoom : defaultFullScreenZoom;
+                    if(window.innerWidth >= maxHorizontalResolution) {
+                        zoomDivider = (window.innerWidth / maxHorizontalResolution) * defaultFullScreenZoom;
+                        applyHighResolutionTextAdaptions();
+                    } else if(window.innerWidth < smallScaleSnapPoint) {
+                        zoomDivider = smallFullScreenZoom;
+                        applyLowResolutionTextAdapations();
+                    } else if(window.innerWidth < mediumScaleSnapPoint) {
+                        zoomDivider = mediumFullScreenZoom;
+                        applyMediumResolutionTextAdapations();
+                    } else {
+                        applyHighResolutionTextAdaptions();
+                    }
                 } else {
+                    zoomDivider = 1;
                     applyHighResolutionTextAdaptions();
                 }
     
