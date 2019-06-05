@@ -34,8 +34,10 @@ function getFader() {
         inMethod: null,
         fadeIn: exitMethod => {
             resumeRenderer();
+            const now = performance.now();
+            tryRendererStateStart(now);
             rendererState.fader.delta = -1;
-            rendererState.fader.start = performance.now();
+            rendererState.fader.start = now;
             if(faderEffectsRenderer.callbackOnce) {
                 faderEffectsRenderer.callbackOnce();
                 faderEffectsRenderer.callbackOnce = null;

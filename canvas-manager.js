@@ -504,7 +504,6 @@ const render = (function(){
         }
     }
 })();
-
 function stopRenderer() {
     console.warn("Warning: Stopping the renderer is deprecated for typical use cases. Use pause and resume methods instead");
     if(!rendererState) {
@@ -516,6 +515,12 @@ function stopRenderer() {
     console.log("Renderer stopped");
 }
 let didStartRenderer = false;
+function tryRendererStateStart(timestamp) {
+    if(rendererState.start && !rendererState.didStart) {
+        rendererState.start(timestamp);
+        rendererState.didStart = true;
+    }
+}
 function startRenderer() {
     if(!ENV_FLAGS.ALLOW_REPEAT_RENDER_START && didStartRenderer) {
         throw Error("Canvas handler: Repeat renderer starts are disallowed by your environment flags!");
@@ -530,9 +535,7 @@ function startRenderer() {
         window.cancelAnimationFrame(animationFrame);
     }
     animationFrame = window.requestAnimationFrame(render);
-    if(rendererState.start) {
-        rendererState.start(performance.now());
-    }
+    tryRendererStateStart(performance.now());
     console.log("Canvas handler: Renderer started for the first time.");
 }
 
