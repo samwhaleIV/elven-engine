@@ -396,7 +396,7 @@ function applySizeMode(forced=false) {
                 if(!rendererState.noScale) {
                     zoomDivider = rendererState ? rendererState.zoomDivider || defaultFullScreenZoom : defaultFullScreenZoom;
                     if(window.innerWidth >= maxHorizontalResolution) {
-                        zoomDivider = (window.innerWidth / maxHorizontalResolution) * defaultFullScreenZoom;
+                        zoomDivider = window.innerWidth / maxHorizontalResolution * defaultFullScreenZoom;
                         applyHighResolutionTextAdaptions();
                     } else if(window.innerWidth < smallScaleSnapPoint) {
                         zoomDivider = smallFullScreenZoom;
@@ -408,7 +408,12 @@ function applySizeMode(forced=false) {
                         applyHighResolutionTextAdaptions();
                     }
                 } else {
-                    zoomDivider = 1;
+                    if(window.innerWidth >= maxHorizontalResolution) {
+                        //4k scaling is forced regardless of noScale
+                        zoomDivider = window.innerWidth / maxHorizontalResolution;
+                    } else {
+                        zoomDivider = 1;
+                    }
                     applyHighResolutionTextAdaptions();
                 }
     

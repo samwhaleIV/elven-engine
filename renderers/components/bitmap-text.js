@@ -1,7 +1,7 @@
 const BitmapText = new (function(){
 
-    const letterSpacingFactor = 1;
-    const wordSpacingFactor = 6;
+    const letterSpacingFactor = 2;
+    const wordSpacingFactor = 4;
 
     let bitmap = null;
     let sourceHeight = null;
@@ -24,7 +24,7 @@ const BitmapText = new (function(){
     }
     const textWrapTest = function(words,maxWidth,scale) {
         const horizontalSpace = scale * wordSpacingFactor;
-        const textSpacing = scale * letterSpacingFactor;
+        const textSpacing = letterSpacingFactor;
         let xOffset = 0;
         let i = 0;
         let isNewLine = true;
@@ -88,14 +88,15 @@ const BitmapText = new (function(){
     }
     function drawTextWrapping(words,x,y,maxWidth,scale,color) {
         const horizontalSpace = scale * wordSpacingFactor;
-        const textSpacing = scale * letterSpacingFactor;
+        const textSpacing = letterSpacingFactor;
         let xOffset = 0;
         let yOffset = 0;
 
         let baseColorRow = colorToRow[color];
         let colorRow = baseColorRow;
 
-        const drawHeight = (sourceHeight+1) * scale;
+        const drawHeight = sourceHeight * scale;
+        const lineHeight = drawHeight + scale;
         let i = 0;
         context.fillStyle = color;
         let drawingCustomColor = false;
@@ -105,7 +106,7 @@ const BitmapText = new (function(){
             if(textControlCodes[word]) {
                 if(word === "\n") {
                     xOffset = 0;
-                    yOffset += drawHeight;
+                    yOffset += lineHeight;
                     isNewLine = true;
                 } else {
                     if(drawingCustomColor) {
@@ -136,7 +137,7 @@ const BitmapText = new (function(){
     
                 if(xOffset + wordTestWidth >= maxWidth) {
                     xOffset = 0;
-                    yOffset += drawHeight;
+                    yOffset += lineHeight
                 }
         
                 i2 = 0;
