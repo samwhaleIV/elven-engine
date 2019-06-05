@@ -310,7 +310,7 @@ function applySizeMode(forced=false) {
     if(!rendererState) {
         return;
     }
-    if(!forced && rendererState.transitioning) {
+    if(!forced && paused) {
         sizeApplicationDeferred = true;
         return;
     }

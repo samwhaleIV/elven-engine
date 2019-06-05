@@ -1,6 +1,6 @@
 const BitmapText = new (function(){
 
-    const letterSpacingFactor = 2;
+    const textSpacing = 2;
     const wordSpacingFactor = 4;
 
     let bitmap = null;
@@ -24,7 +24,6 @@ const BitmapText = new (function(){
     }
     const textWrapTest = function(words,maxWidth,scale) {
         const horizontalSpace = scale * wordSpacingFactor;
-        const textSpacing = letterSpacingFactor;
         let xOffset = 0;
         let i = 0;
         let isNewLine = true;
@@ -88,7 +87,6 @@ const BitmapText = new (function(){
     }
     function drawTextWrapping(words,x,y,maxWidth,scale,color) {
         const horizontalSpace = scale * wordSpacingFactor;
-        const textSpacing = letterSpacingFactor;
         let xOffset = 0;
         let yOffset = 0;
 
