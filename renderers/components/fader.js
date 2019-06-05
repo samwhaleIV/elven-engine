@@ -5,6 +5,7 @@ let faderEffectsRenderer = null;
 let faderTime = 0;
 let faderDelay = 0;
 let musicFadeOutDuration = 0;
+const musicFaderSafetyBuffer = 100;
 function setFaderInSound(soundName) {
     faderInSound = soundName;
 }
@@ -15,12 +16,21 @@ function setFaderEffectsRenderer(renderer) {
     faderEffectsRenderer = renderer;
 }
 function setFaderDuration(time) {
+    if(musicFadeOutDuration + musicFaderSafetyBuffer > time) {
+        faderTime = musicFadeOutDuration + musicFaderSafetyBuffer;
+        console.warn(`Fader duration sould be greater by ${musicFaderSafetyBuffer}ms than the music fade out duration; Setting fader time to a safe value instead`);
+        return;
+    }
     faderTime = time;
 }
 function setFaderDelay(time) {
     faderDelay = time;
 }
 function setMusicFadeDuration(time) {
+    if(time + musicFaderSafetyBuffer > faderTime) {
+        musicFadeOutDuration = time - musicFaderSafetyBuffer;
+        console.warn(`Music fade duration should be less than ${musicFaderSafetyBuffer}ms than the overall fader duration; Setting music fade out time to a safe value instead`);
+    }
     musicFadeOutDuration = time;
 }
 function getFader() {
