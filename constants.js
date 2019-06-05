@@ -64,6 +64,7 @@ const DEFAULT_KEY_BINDS = JSON.stringify({
     F11: kc.fullscreen
 });
 const KEY_BINDS_KEY = "UV_KEY_BINDS";
+const VOLUME_STORAGE_KEY = "UV_VOLUME";
 
 const textControlCodes = {
     "\n": /\n/g,

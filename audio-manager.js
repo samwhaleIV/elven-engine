@@ -1,13 +1,82 @@
 "use strict";
 const audioContext = new AudioContext();
 
+let musicVolume = musicNodeGain;
+let soundVolume = soundGain;
+
+const volumeScaleFactor = 2;
+
 const volumeNode = audioContext.createGain();
-volumeNode.gain.setValueAtTime(soundGain,audioContext.currentTime);
+volumeNode.gain.setValueAtTime(soundVolume,audioContext.currentTime);
 volumeNode.connect(audioContext.destination);
 
 const musicVolumeNode = audioContext.createGain();
-musicVolumeNode.gain.setValueAtTime(musicNodeGain,audioContext.currentTime);
+musicVolumeNode.gain.setValueAtTime(musicVolume,audioContext.currentTime);
 musicVolumeNode.connect(audioContext.destination);
+
+function saveVolumeChanges() {
+    localStorage.setItem(VOLUME_STORAGE_KEY,JSON.stringify({
+        sound: getSoundVolume(),
+        music: getMusicVolume(),
+        scaleFactor: volumeScaleFactor
+    }));
+}
+function restoreVolumeChanges() {
+    const storageResult = localStorage.getItem(VOLUME_STORAGE_KEY);
+    if(storageResult) {
+        const volumeData = JSON.parse(storageResult);
+        const scaleFactor = volumeData.scaleFactor ? volumeData.scaleFactor : volumeScaleFactor;
+        setSoundVolume(volumeData.sound,scaleFactor);
+        setMusicVolume(volumeData.music,scaleFactor);
+    } else {
+        saveVolumeChanges();
+    }
+}
+
+function getMusicVolume() {
+    return musicVolume / volumeScaleFactor;
+}
+function getSoundVolume() {
+    return soundVolume / volumeScaleFactor;
+}
+function setMusicVolume(normal,scaleFactor=volumeScaleFactor) {
+    normal *= scaleFactor;
+    if(normal > volumeScaleFactor) {
+        normal = volumeScaleFactor;
+    }
+    if(normal > 0) {
+        musicVolume = normal;
+        if(musicMuted) {
+            unmuteMusic();
+        } else {
+            musicVolumeNode.gain.value = normal;
+        }
+    } else {
+        musicVolume = 0;
+        if(!musicMuted) {
+            muteMusic();
+        }
+    }
+}
+function setSoundVolume(normal,scaleFactor=volumeScaleFactor) {
+    normal *= scaleFactor;
+    if(normal > volumeScaleFactor) {
+        normal = volumeScaleFactor;
+    }
+    if(normal > 0) {
+        soundVolume = normal;
+        if(soundMuted) {
+            unmuteSound();
+        } else {
+            volumeNode.gain.value = normal;
+        }
+    } else {
+        soundVolume = 0;
+        if(!soundMuted) {
+            muteSound();
+        }
+    }
+}
 
 const musicOutputNode = musicVolumeNode;
 const soundOutputNode = volumeNode;
@@ -68,7 +137,7 @@ function muteSound() {
 
 function unmuteSound() {
     if(soundMuted) {
-        volumeNode.gain.setValueAtTime(soundGain,audioContext.currentTime);
+        volumeNode.gain.setValueAtTime(soundVolume,audioContext.currentTime);
         soundMuted = false;
         localStorage.setItem("soundMuted",false);
     } else {
@@ -78,7 +147,7 @@ function unmuteSound() {
 
 function unmuteMusic() {
     if(musicMuted) {
-        musicVolumeNode.gain.setValueAtTime(musicNodeGain,audioContext.currentTime);
+        musicVolumeNode.gain.setValueAtTime(musicVolume,audioContext.currentTime);
         musicMuted = false;
         localStorage.setItem("musicMuted",false);
     } else {
