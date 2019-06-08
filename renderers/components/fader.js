@@ -63,7 +63,15 @@ function getFader() {
                 playSound(faderInSound,staticTime);
             }
             if(rendererState.song) {
-                if(!musicMuted) {
+                if(musicMuted) {
+                    if(!rendererState.musicOptional) {
+                        if(rendererState.songIntro) {
+                            playMusicWithIntro(rendererState.song,rendererState.songIntro);
+                        } else {
+                            playMusic(rendererState.song);
+                        }
+                    }
+                } else {
                     if(rendererState.songIntro) {
                         playMusicWithIntro(rendererState.song,rendererState.songIntro);
                     } else {
@@ -132,7 +140,7 @@ function getFader() {
                         );
                         return;
                     }
-                    if(musicMuted) {
+                    if(rendererState.musicOptional && musicMuted) {
                         fadeInCompleter();
                         return;
                     }
