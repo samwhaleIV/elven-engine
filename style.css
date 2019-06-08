@@ -5,6 +5,7 @@ body {
     padding: 0;
     overflow: hidden;
     background-color: black;
+    touch-action: none;
 }
 canvas#canvas {
     position: absolute;

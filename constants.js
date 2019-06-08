@@ -6,11 +6,11 @@ const maxHorizontalResolution = 1920;
 const mediumScaleSnapPoint = 1600;
 const smallScaleSnapPoint = 810;
 
-const defaultFullScreenZoom = 1.25;
-const mediumFullScreenZoom = 1;
-const smallFullScreenZoom = 0.8;
+const defaultFullScreenZoom = 1;
+const mediumFullScreenZoom = 0.9;
+const smallFullScreenZoom = 0.75;
 
-const maximumWidthToHeightRatio = 2.25;
+const maximumWidthToHeightRatio = 2.5;
 const maximumHeightToWidthRatio = 1.25;
 
 const highResolutionAdaptiveTextScale = 3;

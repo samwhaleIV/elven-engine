@@ -361,8 +361,9 @@ function applySizeMode(forced=false) {
         }
         if(sizeMode === sizeModes.stretch.name &&
             (
-                window.innerWidth / window.innerHeight > maximumWidthToHeightRatio ||
-                window.innerHeight / window.innerWidth > maximumHeightToWidthRatio
+                (window.innerWidth / window.innerHeight > maximumWidthToHeightRatio ||
+                window.innerHeight / window.innerWidth > maximumHeightToWidthRatio) ||
+                (window.innerHeight < internalHeight || window.innerWidth < internalWidth)
             ) && !rendererState.disableAdaptiveFill
         ) {
             sizeMode = sizeModes.fit.name;
@@ -393,7 +394,7 @@ function applySizeMode(forced=false) {
             default:
             case sizeModes.stretch.name:
                 let zoomDivider;
-                if(!rendererState.noScale) {
+                if(!rendererState.noPixelScale) {
                     zoomDivider = rendererState ? rendererState.zoomDivider || defaultFullScreenZoom : defaultFullScreenZoom;
                     if(window.innerWidth >= maxHorizontalResolution) {
                         zoomDivider = window.innerWidth / maxHorizontalResolution * defaultFullScreenZoom;

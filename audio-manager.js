@@ -4,7 +4,7 @@ const audioContext = new AudioContext();
 let musicVolume = musicNodeGain;
 let soundVolume = soundGain;
 
-const volumeScaleFactor = 2;
+const volumeScaleFactor = 1;
 
 const volumeNode = audioContext.createGain();
 volumeNode.gain.setValueAtTime(soundVolume,audioContext.currentTime);
