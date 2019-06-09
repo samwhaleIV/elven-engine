@@ -413,12 +413,22 @@ function drawTextBlack(text,x,y,scale) {
     return drawTextColor("black",text,x,y,scale);
 }
 
+const cornerTextMargin = 30;
+const halfCornerTextMargin = cornerTextMargin / 2;
+
 const textTestData = drawTextTest("loading...",MediumTextScale);
-textTestData.width += 30;
-textTestData.height += 30;
+textTestData.width += cornerTextMargin;
+textTestData.height += cornerTextMargin;
+
+function drawCornerText(text) {
+    const textTestData = drawTextTest(text,MediumTextScale);
+    context.fillStyle = "black";
+    context.fillRect(0,0,textTestData.width+cornerTextMargin,textTestData.height+cornerTextMargin);
+    drawTextWhite(text,halfCornerTextMargin,halfCornerTextMargin,MediumTextScale);
+}
 
 function drawLoadingText() {
     context.fillStyle = "black";
     context.fillRect(0,0,textTestData.width,textTestData.height);
-    drawTextWhite("loading...",15,15,MediumTextScale);
+    drawTextWhite("loading...",halfCornerTextMargin,halfCornerTextMargin,MediumTextScale);
 }
