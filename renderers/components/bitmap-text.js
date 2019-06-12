@@ -41,15 +41,15 @@ const BitmapText = new (function(){
                     isNewLine = false;
                 }
                 let wordTestWidth = 0;
-                let i2 = 0;
+                let i = 0;
     
-                while(i2 < word.length) {
-                    const character = BitmapManifest[word[i2]];
+                while(i < word.length) {
+                    const character = BitmapManifest[word[i]];
                     wordTestWidth += character.width;
                     if(character.extraSpace) {
                         wordTestWidth += character.extraSpace;
                     }
-                    i2++;
+                    i++;
                 }
                 wordTestWidth *= scale;
                 wordTestWidth += word.length * textSpacing;
@@ -120,15 +120,15 @@ const BitmapText = new (function(){
                     isNewLine = false;
                 }
                 let wordTestWidth = 0;
-                let i2 = 0;
+                let i = 0;
     
-                while(i2 < word.length) {
-                    const character = BitmapManifest[word[i2]];
+                while(i < word.length) {
+                    const character = BitmapManifest[word[i]];
                     wordTestWidth += character.width;
                     if(character.extraSpace) {
                         wordTestWidth += character.extraSpace;
                     }
-                    i2++;
+                    i++;
                 }
                 wordTestWidth *= scale;
                 wordTestWidth += word.length * textSpacing;
@@ -138,9 +138,9 @@ const BitmapText = new (function(){
                     yOffset += lineHeight
                 }
         
-                i2 = 0;
-                while(i2 < word.length) {
-                    const character = BitmapManifest[word[i2]];
+                i = 0;
+                while(i < word.length) {
+                    const character = BitmapManifest[word[i]];
                     const drawWidth = character.width * scale;
 
                     context.drawImage(
@@ -153,10 +153,10 @@ const BitmapText = new (function(){
                     if(character.extraSpace) {
                         xOffset += character.extraSpace * scale;
                     }
-                    if(i2 < word.length-1) {
+                    if(i < word.length-1) {
                         xOffset += textSpacing;
                     }
-                    i2++;
+                    i++;
                 }
                 if(xOffset) {
                     xOffset += horizontalSpace;
@@ -170,5 +170,53 @@ const BitmapText = new (function(){
     }
     this.drawTextWrappingLookAheadBlack = (processedText,x,y,maxWidth,scale) => {
         drawTextWrappingLookAhead(processedText,x,y,maxWidth,scale,"black");
+    }
+
+    this.drawTextTest = (text,scale) => {
+        const drawHeight = sourceHeight * scale;
+        let i = 0, xOffset = 0;
+        while(i < text.length) {
+            const character = BitmapManifest[text[i]];
+            const drawWidth = character.width * scale;
+            xOffset += drawWidth;
+            if(character.extraSpace) {
+                xOffset += character.extraSpace * scale;
+            }
+            if(i < text.length-1) {
+                xOffset += textSpacing;
+            }
+            i++;
+        }
+        return {
+            width: xOffset,
+            height: drawHeight
+        }
+    }
+
+    const drawText = (text,x,y,scale,colorRow) => {
+        const drawHeight = sourceHeight * scale;
+        let i = 0, xOffset = 0;
+        while(i < text.length) {
+            const character = BitmapManifest[text[i]];
+            const drawWidth = character.width * scale;
+            context.drawImage(
+                bitmap,character.x,colorRow*sourceHeight,character.width,sourceHeight,
+                x+xOffset,y,drawWidth,drawHeight
+            );
+            xOffset += drawWidth;
+            if(character.extraSpace) {
+                xOffset += character.extraSpace * scale;
+            }
+            if(i < text.length-1) {
+                xOffset += textSpacing;
+            }
+            i++;
+        }
+    }
+    this.drawTextBlack = (text,x,y,scale) => {
+        drawText(text,x,y,scale,0);
+    }
+    this.drawTextWhite = (text,x,y,scale) => {
+        drawText(text,x,y,scale,1);
     }
 })();
