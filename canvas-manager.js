@@ -7,10 +7,13 @@ let halfWidth;
 let halfHeight;
 let doubleWidth;
 let doubleHeight;
-let verticalSizeRatio;
-let horizontalSizeRatio;
 let largestDimension;
+let smallestDimension;
 let halfLargestDimension;
+let halfSmallestDimension;
+let aspectRatio;
+let greaterWidth;
+let greaterHeight;
 
 let adaptiveTextScale;
 let adaptiveTextSpacing;
@@ -24,10 +27,23 @@ function setSizeConstants() {
     halfHeight = fullHeight / 2;
     doubleWidth = fullWidth * 2;
     doubleHeight = fullHeight * 2;
-    horizontalSizeRatio = fullWidth / internalWidth;
-    verticalSizeRatio = fullHeight / internalHeight;
-    largestDimension = fullWidth > fullHeight ? fullWidth : fullHeight;
+    if(fullWidth > fullHeight) {
+        largestDimension = fullWidth;
+        smallestDimension = fullHeight;
+    } else {
+        largestDimension = fullHeight;
+        smallestDimension = fullWidth;
+    }
     halfLargestDimension = largestDimension / 2;
+    halfSmallestDimension = smallestDimension / 2;
+    aspectRatio = fullWidth / fullHeight;
+    if(aspectRatio >= 1) {
+        greaterWidth = true;
+        greaterHeight = false;
+    } else {
+        greaterWidth = false;
+        greaterHeight = true;
+    }
 }
 
 function createRainbowGradient() {
