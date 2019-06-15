@@ -41,15 +41,15 @@ const BitmapText = new (function(){
                     isNewLine = false;
                 }
                 let wordTestWidth = 0;
-                let i = 0;
+                let i2 = 0;
     
-                while(i < word.length) {
-                    const character = BitmapManifest[word[i]];
+                while(i2 < word.length) {
+                    const character = BitmapManifest[word[i2]];
                     wordTestWidth += character.width;
                     if(character.extraSpace) {
                         wordTestWidth += character.extraSpace;
                     }
-                    i++;
+                    i2++;
                 }
                 wordTestWidth *= scale;
                 wordTestWidth += word.length * textSpacing;
