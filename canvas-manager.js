@@ -140,7 +140,10 @@ function getRelativeEventLocation(event) {
     }
 }
 function touchEnabled(event) {
-    return !paused && event.isPrimary && rendererState && !rendererState.transitioning;
+    return rendererState && !rendererState.transitioning && !pasued && event.isPrimary;
+}
+function touchEnabledMove(event) {
+    return rendererState && !paused && event.isPrimary;
 }
 function keyinputEnabled(event) {
     if(!rendererState) {
@@ -221,7 +224,7 @@ canvas.onpointerdown = event => {
 }
 canvas.onpointermove = processMouseMove;
 function processMouseMove(event) {
-    if(touchEnabled(event)) {
+    if(touchEnabledMove(event)) {
         const relativeEventLocation = getRelativeEventLocation(
             event
         );
