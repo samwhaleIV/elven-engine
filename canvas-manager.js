@@ -140,12 +140,12 @@ function getRelativeEventLocation(event) {
     }
 }
 function touchEnabled(event) {
-    return rendererState && !rendererState.transitioning && !pasued && event.isPrimary;
+    return rendererState && !rendererState.transitioning && !paused && event.isPrimary;
 }
 function touchEnabledMove(event) {
     return rendererState && !paused && event.isPrimary;
 }
-function keyinputEnabled(event) {
+function keyinputEnabled() {
     if(!rendererState) {
         return false;
     } else if((paused && !rendererState.allowKeysDuringPause) || rendererState.transitioning) {
