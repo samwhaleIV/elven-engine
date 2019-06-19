@@ -192,7 +192,11 @@ function playMusicWithIntro(loopName,introName,withLoop=true) {
     const introBuffer = audioBuffers[introName];
     const loopBuffer = audioBuffers[loopName];
     if(!introBuffer || !loopBuffer) {
-        console.warn(`Audio manager: '${loopName}' or '${introName}' is missing from audio buffers. Did we fail to load it?`);
+        if(!introBuffer) {
+            console.warn(`Audio manager: '${introName}' is missing from audio buffers. Did we fail to load it?`);
+        } else {
+            console.warn(`Audio manager: '${loopName}' is missing from audio buffers. Did we fail to load it?`);
+        }
     } else {
         const musicNode = audioContext.createBufferSource();
         if(startSpeedManifest[introName]) {
@@ -270,7 +274,6 @@ function playMusic(name,withLoop=true) {
         } else {
             console.warn(`Audio manager: '${name}' is missing from audio buffers. Did we fail to load it?`);
         }
-
         if(!withLoop) {
             return 0;
         }
@@ -341,11 +344,6 @@ function addBufferSource(fileName,callback,errorCallback) {
         }
         return;
     }
-    const errorCallbackWithCache = () => {
-        if(errorCallback) {
-            errorCallback(fileName);
-        }
-    }
     const decode = audioData => {
         audioContext.decodeAudioData(
             audioData,
@@ -361,7 +359,9 @@ function addBufferSource(fileName,callback,errorCallback) {
                 failedBuffers[newName] = true;
                 sendAudioBufferAddedCallback(newName);
                 console.error(`Audio manager: Failure to decode '${fileName}' as an audio file`);
-                errorCallbackWithCache();
+                if(errorCallback) {
+                    errorCallback(fileName);
+                }
             }
         );
     }
@@ -386,7 +386,9 @@ function addBufferSource(fileName,callback,errorCallback) {
             console.log(`Audio manager: Failure to fetch '${fileName}' (Status code: ${this.status})`);
             failedBuffers[newName] = true;
             sendAudioBufferAddedCallback(newName);
-            errorCallbackWithCache();
+            if(errorCallback) {
+                errorCallback(fileName);
+            }
         }
     }
     request.send();
