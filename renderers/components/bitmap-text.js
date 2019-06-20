@@ -55,7 +55,7 @@ const BitmapText = new (function(){
                     i2++;
                 }
                 xOffset += wordTestWidth;
-                if(xOffset >= maxWidth) {
+                if(xOffset > maxWidth) {
                     xOffset = wordTestWidth;
                     wrapRequiredTable[i] = true;
                 }
@@ -133,7 +133,7 @@ const BitmapText = new (function(){
                     i2++;
                 }
     
-                if(xOffset + wordTestWidth >= maxWidth) {
+                if(xOffset + wordTestWidth > maxWidth) {
                     xOffset = 0;
                     yOffset += lineHeight
                 }
