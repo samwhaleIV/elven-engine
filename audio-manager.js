@@ -186,6 +186,11 @@ function getNextIntroID() {
     return lastIntroID++;
 }
 
+let lastSoundID = 0;
+function getNextSoundID() {
+    return lastSoundID++;
+}
+let activeSounds = {};
 let activeLoops = {};
 
 function playMusicWithIntro(loopName,introName,withLoop=true) {
@@ -327,13 +332,46 @@ function playSound(name,duration) {
         if(duration) {
             bufferSourceNode.playbackRate.setValueAtTime(buffer.duration / duration,audioContext.currentTime);
         }
+        const soundID = getNextSoundID();
+        bufferSourceNode.soundID = soundID;
+        bufferSourceNode.onended = () => {
+            const soundBucket = activeSounds[name];
+            if(soundBucket) {
+                const activeSound = soundBucket[soundID];
+                if(activeSound) {
+                    delete soundBucket[soundID];
+                    if(!Object.keys(soundBucket).length) {
+                        delete activeSounds[name];
+                    }
+                }
+            }
+        }
+        let soundBucket = activeSounds[name];
+        if(!soundBucket) {
+            soundBucket = {};
+            activeSounds[name] = soundBucket;
+        }
+        soundBucket[soundID] = bufferSourceNode;
         bufferSourceNode.connect(soundOutputNode);
         bufferSourceNode.start();
+
     } else {
         console.warn(`Audio manager: '${name}' is missing from audio buffers. Did we fail to load it?`);
     }
 }
-function addBufferSource(fileName,callback,errorCallback) {
+function stopSoundBucket(bucket) {
+    Object.values(bucket).forEach(soundInstance => soundInstance.stop());
+}
+function stopSound(name) {
+    const soundBucket = activeSounds[name];
+    if(soundBucket) {
+        stopSoundBucket(soundBucket);
+    }
+}
+function stopAllSounds() {
+    Object.entries(activeSounds).forEach(stopSoundBucket);
+}
+function addBufferSource (fileName,callback,errorCallback) {
     let newName = fileName.split("/").pop();
     const newNameSplit = newName.split(".");
     newName = newNameSplit[newNameSplit.length-2];

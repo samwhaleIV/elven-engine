@@ -42,23 +42,22 @@ const BitmapText = new (function(){
                 }
                 let wordTestWidth = 0;
                 let i2 = 0;
-    
                 while(i2 < word.length) {
                     const character = BitmapManifest[word[i2]];
-                    wordTestWidth += character.width;
+                    const drawWidth = character.width * scale;
+                    wordTestWidth += drawWidth;
                     if(character.extraSpace) {
-                        wordTestWidth += character.extraSpace;
+                        wordTestWidth += character.extraSpace * scale;
+                    }
+                    if(i2 < word.length-1) {
+                        wordTestWidth += textSpacing;
                     }
                     i2++;
                 }
-                wordTestWidth *= scale;
-                wordTestWidth += word.length * textSpacing;
-
                 xOffset += wordTestWidth;
-    
                 if(xOffset >= maxWidth) {
+                    xOffset = wordTestWidth;
                     wrapRequiredTable[i] = true;
-                    xOffset = 0;
                 }
                 if(xOffset) {
                     xOffset += horizontalSpace;
@@ -120,27 +119,28 @@ const BitmapText = new (function(){
                     isNewLine = false;
                 }
                 let wordTestWidth = 0;
-                let i = 0;
-    
-                while(i < word.length) {
-                    const character = BitmapManifest[word[i]];
-                    wordTestWidth += character.width;
+                let i2 = 0;
+                while(i2 < word.length) {
+                    const character = BitmapManifest[word[i2]];
+                    const drawWidth = character.width * scale;
+                    wordTestWidth += drawWidth;
                     if(character.extraSpace) {
-                        wordTestWidth += character.extraSpace;
+                        wordTestWidth += character.extraSpace * scale;
                     }
-                    i++;
+                    if(i2 < word.length-1) {
+                        wordTestWidth += textSpacing;
+                    }
+                    i2++;
                 }
-                wordTestWidth *= scale;
-                wordTestWidth += word.length * textSpacing;
     
                 if(xOffset + wordTestWidth >= maxWidth) {
                     xOffset = 0;
                     yOffset += lineHeight
                 }
         
-                i = 0;
-                while(i < word.length) {
-                    const character = BitmapManifest[word[i]];
+                i2 = 0;
+                while(i2 < word.length) {
+                    const character = BitmapManifest[word[i2]];
                     const drawWidth = character.width * scale;
 
                     context.drawImage(
@@ -153,10 +153,10 @@ const BitmapText = new (function(){
                     if(character.extraSpace) {
                         xOffset += character.extraSpace * scale;
                     }
-                    if(i < word.length-1) {
+                    if(i2 < word.length-1) {
                         xOffset += textSpacing;
                     }
-                    i++;
+                    i2++;
                 }
                 if(xOffset) {
                     xOffset += horizontalSpace;
