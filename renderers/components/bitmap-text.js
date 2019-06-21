@@ -172,11 +172,27 @@ const BitmapText = new (function(){
         drawTextWrappingLookAhead(processedText,x,y,maxWidth,scale,"black");
     }
 
+    this.drawTextWrapping = (processedText,x,y,maxWidth,scale,color) => {
+        drawTextWrapping(processedText,x,y,maxWidth,scale,color);
+    }
+    this.drawTextWrappingWhite = (processedText,x,y,maxWidth,scale) => {
+        drawTextWrapping(processedText,x,y,maxWidth,scale,"white");
+    }
+    this.drawTextWrappingBlack = (processedText,x,y,maxWidth,scale) => {
+        drawTextWrapping(processedText,x,y,maxWidth,scale,"black");
+    }
+
     this.drawTextTest = (text,scale) => {
         const drawHeight = sourceHeight * scale;
+        const horizontalSpace = scale * wordSpacingFactor;
         let i = 0, xOffset = 0;
         while(i < text.length) {
             const character = BitmapManifest[text[i]];
+            if(!character) {
+                xOffset += horizontalSpace;
+                i++;
+                continue;
+            }
             const drawWidth = character.width * scale;
             xOffset += drawWidth;
             if(character.extraSpace) {
@@ -195,9 +211,15 @@ const BitmapText = new (function(){
 
     const drawText = (text,x,y,scale,colorRow) => {
         const drawHeight = sourceHeight * scale;
+        const horizontalSpace = scale * wordSpacingFactor;
         let i = 0, xOffset = 0;
         while(i < text.length) {
             const character = BitmapManifest[text[i]];
+            if(!character) {
+                xOffset += horizontalSpace;
+                i++;
+                continue;
+            }
             const drawWidth = character.width * scale;
             context.drawImage(
                 bitmap,character.x,colorRow*sourceHeight,character.width,sourceHeight,

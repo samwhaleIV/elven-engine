@@ -1,5 +1,5 @@
 "use strict";
-const audioContext = new AudioContext();
+const audioContext = new (window.AudioContext||window.webkitAudioContext);
 
 let musicVolume = musicNodeGain;
 let soundVolume = soundGain;
