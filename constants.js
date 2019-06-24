@@ -75,7 +75,8 @@ const textControlCodes = {
     "ɇ": /ɇ/g,
     "Ƚ": /Ƚ/g,
     "ȿ": /ȿ/g,
-    "ɍ": /ɍ/g
+    "ɍ": /ɍ/g,
+    "φ": /φ/g
 }
 const textColorLookup = {
     "ȸ": "red",
@@ -85,6 +86,7 @@ const textColorLookup = {
     "ɇ": "blueviolet",
     "Ƚ": "darkorange",
     "ȿ": "deeppink",
+    "φ": "cyan",
     "ɍ": 0
 }
 const inverseTextColorLookup = (function(){

@@ -17,6 +17,7 @@ const BitmapText = new (function(){
     colorToRow[inverseTextColorLookup["blueviolet"]] = 6;
     colorToRow[inverseTextColorLookup["darkorange"]] = 8;
     colorToRow[inverseTextColorLookup["deeppink"]] = 7;
+    colorToRow[inverseTextColorLookup["cyan"]] = 9;
 
     this.verifyBitmap = () => {
         bitmap = imageDictionary["elven-font"];
