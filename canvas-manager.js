@@ -509,6 +509,8 @@ const render = (function(){
             backgroundContext.fill = "black";
             backgroundContext.fillRect(0,0,1,1);
             if(!paused) {
+                rendererState.render(timestamp);
+                rendererState.fader.render(timestamp);
                 const gamepads = navigator.getGamepads();
                 let i = 0;
                 while(i < gamepads.length) {
@@ -518,8 +520,6 @@ const render = (function(){
                     }
                     i++;
                 }
-                rendererState.render(timestamp);
-                rendererState.fader.render(timestamp);
             }
         }
     }
