@@ -64,6 +64,7 @@ let widthByHeight = internalWidth / internalHeight;
 const backgroundCanvas = document.getElementById("background-canvas");
 const context = canvas.getContext("2d");
 const backgroundContext = backgroundCanvas.getContext("2d");
+backgroundContext.fillStyle = "black";
 
 let electron = null;
 let electronWindow = null;
@@ -496,7 +497,6 @@ const render = (function(){
     if(ENV_FLAGS.CONTROLLER_DISABLED) {
         return function render(timestamp) {
             animationFrame = window.requestAnimationFrame(render); 
-            backgroundContext.fill = "black";
             backgroundContext.fillRect(0,0,1,1);
             if(!paused) {
                 rendererState.render(timestamp);
@@ -506,7 +506,6 @@ const render = (function(){
     } else {
         return function render(timestamp) {
             animationFrame = window.requestAnimationFrame(render); 
-            backgroundContext.fill = "black";
             backgroundContext.fillRect(0,0,1,1);
             if(!paused) {
                 rendererState.render(timestamp);
