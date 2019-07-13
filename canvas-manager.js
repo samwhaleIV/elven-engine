@@ -14,6 +14,7 @@ let halfSmallestDimension;
 let aspectRatio;
 let greaterWidth;
 let greaterHeight;
+let widthNormal;
 
 let adaptiveTextScale;
 let adaptiveTextSpacing;
@@ -44,6 +45,7 @@ function setSizeConstants() {
         greaterWidth = false;
         greaterHeight = true;
     }
+    widthNormal = fullWidth / maxHorizontalResolution;
 }
 
 function createRainbowGradient() {

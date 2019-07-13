@@ -1,16 +1,21 @@
 "use strict";
 let faderInSound = null;
 let faderOutSound = null;
+let faderInOnce = false;
+let faderOutOnce = false;
+
 let faderEffectsRenderer = null;
 let faderTime = 0;
 let faderDelay = 0;
 let musicFadeOutDuration = 0;
 const musicFaderSafetyBuffer = 100;
-function setFaderInSound(soundName) {
+function setFaderInSound(soundName,once=false) {
     faderInSound = soundName;
+    faderInOnce = once;
 }
-function setFaderOutSound(soundName) {
+function setFaderOutSound(soundName,once=false) {
     faderOutSound = soundName;
+    faderOutOnce = once;
 }
 function setFaderEffectsRenderer(renderer) {
     faderEffectsRenderer = renderer;
@@ -61,6 +66,10 @@ function getFader() {
             const staticTime = rendererState.fader.time / 1000;
             if(faderInSound) {
                 playSound(faderInSound,staticTime);
+                if(faderInOnce) {
+                    faderInOnce = false;
+                    faderInSound = null;
+                }
             }
             if(rendererState.song) {
                 if(musicMuted) {
@@ -91,6 +100,10 @@ function getFader() {
             const staticTime = rendererState.fader.time / 1000;
             if(faderOutSound) {
                 playSound(faderOutSound,staticTime);
+                if(faderOutOnce) {
+                    faderOutOnce = false;
+                    faderOutSound = null;
+                }
             }
             if(musicFadeOutDuration) {
                 fadeOutSongs(musicFadeOutDuration);
