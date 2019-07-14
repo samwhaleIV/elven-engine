@@ -118,6 +118,9 @@ function getFader() {
                 }
                 rendererState.transitioning = false;
             }
+            if(rendererState.faderCompleted) {
+                rendererState.faderCompleted();
+            }
             console.log("Transition complete");
         },
         onoutEnd: () => {
