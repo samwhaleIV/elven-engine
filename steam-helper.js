@@ -1,6 +1,5 @@
 let steamworks = null;
 let steamworksLoaded = false;
-let suppressNullAchievements = true;
 
 function setAchievement(ID) {
     if(steamworksLoaded) {
@@ -10,12 +9,9 @@ function setAchievement(ID) {
             console.warn(`Steam helper: Failed to set achievement '${ID}'`);
         });
     } else {
-        if(!suppressNullAchievements) {
-            console.log(`Steam helper: Achievement '${ID}' activated (this is a null event)`);
-        }
+        console.log(`Steam helper: Achievement '${ID}' activated (this is a null event)`);
     }
 }
-
 function steamSetup() {
     if(typeof(require) !== "undefined") {
         const os = require("os");

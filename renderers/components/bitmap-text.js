@@ -1,7 +1,7 @@
 const BitmapText = new (function(){
 
-    const textSpacing = 2;
-    const wordSpacingFactor = 4;
+    const TEXT_SPACING = 2;
+    const WORD_SPACING_FACTOR = 4;
 
     let bitmap = null;
     let sourceHeight = null;
@@ -24,7 +24,7 @@ const BitmapText = new (function(){
         sourceHeight = bitmap.height / Object.keys(colorToRow).length;
     }
     const textWrapTest = function(words,maxWidth,scale) {
-        const horizontalSpace = scale * wordSpacingFactor;
+        const horizontalSpace = scale * WORD_SPACING_FACTOR;
         let xOffset = 0;
         let i = 0;
         let isNewLine = true;
@@ -51,7 +51,7 @@ const BitmapText = new (function(){
                         wordTestWidth += character.extraSpace * scale;
                     }
                     if(i2 < word.length-1) {
-                        wordTestWidth += textSpacing;
+                        wordTestWidth += TEXT_SPACING;
                     }
                     i2++;
                 }
@@ -86,7 +86,7 @@ const BitmapText = new (function(){
         drawTextWrapping(wordsAdjusted,x,y,maxWidth,scale,color);
     }
     function drawTextWrapping(words,x,y,maxWidth,scale,color) {
-        const horizontalSpace = scale * wordSpacingFactor;
+        const horizontalSpace = scale * WORD_SPACING_FACTOR;
         let xOffset = 0;
         let yOffset = 0;
 
@@ -129,7 +129,7 @@ const BitmapText = new (function(){
                         wordTestWidth += character.extraSpace * scale;
                     }
                     if(i2 < word.length-1) {
-                        wordTestWidth += textSpacing;
+                        wordTestWidth += TEXT_SPACING;
                     }
                     i2++;
                 }
@@ -155,7 +155,7 @@ const BitmapText = new (function(){
                         xOffset += character.extraSpace * scale;
                     }
                     if(i2 < word.length-1) {
-                        xOffset += textSpacing;
+                        xOffset += TEXT_SPACING;
                     }
                     i2++;
                 }
@@ -185,7 +185,7 @@ const BitmapText = new (function(){
 
     this.drawTextTest = (text,scale) => {
         const drawHeight = sourceHeight * scale;
-        const horizontalSpace = scale * wordSpacingFactor;
+        const horizontalSpace = scale * WORD_SPACING_FACTOR;
         let i = 0, xOffset = 0;
         while(i < text.length) {
             const character = BitmapManifest[text[i]];
@@ -200,7 +200,7 @@ const BitmapText = new (function(){
                 xOffset += character.extraSpace * scale;
             }
             if(i < text.length-1) {
-                xOffset += textSpacing;
+                xOffset += TEXT_SPACING;
             }
             i++;
         }
@@ -212,7 +212,7 @@ const BitmapText = new (function(){
 
     const drawText = (text,x,y,scale,colorRow) => {
         const drawHeight = sourceHeight * scale;
-        const horizontalSpace = scale * wordSpacingFactor;
+        const horizontalSpace = scale * WORD_SPACING_FACTOR;
         let i = 0, xOffset = 0;
         while(i < text.length) {
             const character = BitmapManifest[text[i]];
@@ -231,7 +231,7 @@ const BitmapText = new (function(){
                 xOffset += character.extraSpace * scale;
             }
             if(i < text.length-1) {
-                xOffset += textSpacing;
+                xOffset += TEXT_SPACING;
             }
             i++;
         }

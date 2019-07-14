@@ -607,6 +607,6 @@ function forceRender() {
         context,performance.now()
     );
 }
-window.onresize = () => {
+window.addEventListener("resize",function(){
     applySizeMode(false);
-};
+});

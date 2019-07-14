@@ -149,10 +149,10 @@ function drawTextStencil(color,text,x,y,scale,padding) {
         i++;
     }
 
-    context.rect(x-padding,y-padding,padding,drawHeight+padding+padding);//left
-    context.rect(x+xOffset,y-padding,padding,drawHeight+padding+padding);//right
-    context.rect(x,y+drawHeight,xOffset,padding);//bottom
-    context.rect(x,y-padding,xOffset,padding);//top
+    context.rect(x-padding,y-padding,padding,drawHeight+padding+padding); //Left
+    context.rect(x+xOffset,y-padding,padding,drawHeight+padding+padding); //Right
+    context.rect(x,y+drawHeight,xOffset,padding); //Bottom
+    context.rect(x,y-padding,xOffset,padding); //Top
 
     context.fill();
     return {
@@ -310,7 +310,7 @@ function drawTextWrapping(words,x,y,maxWidth,horizontalSpace,verticalSpace,scale
     let xOffset = 0;
     let yOffset = 0;
     const scaleMatrix = ScaleMatrices[scale];
-    const drawHeight = scale * 5; //This is hard-coded - might fuck me over later
+    const drawHeight = scale * 5;
     const textSpacing = scale * 2;
     let i = 0;
     context.fillStyle = color;
