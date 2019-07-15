@@ -64,8 +64,8 @@ const heightByWidth = internalHeight / internalWidth;
 let widthByHeight = internalWidth / internalHeight;
 
 const backgroundCanvas = document.getElementById("background-canvas");
-const context = canvas.getContext("2d");
-const backgroundContext = backgroundCanvas.getContext("2d");
+const context = canvas.getContext("2d",{alpha:false});
+const backgroundContext = backgroundCanvas.getContext("2d",{alpha:false});
 backgroundContext.fillStyle = "black";
 
 let electron = null;
