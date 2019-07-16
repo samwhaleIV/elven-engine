@@ -19,9 +19,12 @@ const BitmapText = new (function(){
     colorToRow[inverseTextColorLookup["deeppink"]] = 7;
     colorToRow[inverseTextColorLookup["cyan"]] = 9;
 
+    colorToRow[inverseTextColorLookup["black"]] = 0;
+    colorToRow[inverseTextColorLookup["white"]] = 1;
+
     this.verifyBitmap = () => {
         bitmap = imageDictionary["elven-font"];
-        sourceHeight = bitmap.height / Object.keys(colorToRow).length;
+        sourceHeight = bitmap.height / (Object.keys(colorToRow).length - 2);
     }
     const textWrapTest = function(words,maxWidth,scale) {
         const horizontalSpace = scale * WORD_SPACING_FACTOR;

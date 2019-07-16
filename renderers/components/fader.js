@@ -120,6 +120,7 @@ function getFader() {
             }
             if(rendererState.faderCompleted) {
                 rendererState.faderCompleted();
+                delete rendererState.faderCompleted;
             }
             console.log("Transition complete");
         },
