@@ -227,28 +227,28 @@ function getFader() {
         },
         render: timestamp => {
             if(rendererState.fader.delta !== 0) {
-                let fadeIntensity;
+                let fadeIntensity = (timestamp - rendererState.fader.start) / rendererState.fader.time;
+                if(fadeIntensity > 1) {
+                    fadeIntensity = 1;
+                }
+                if(fadeIntensity < 0) {
+                    fadeIntensity = 0;
+                }
                 if(rendererState.fader.delta > 0) {
-                    fadeIntensity = (timestamp - rendererState.fader.start) / rendererState.fader.time;
-                    if(fadeIntensity > 1) {
-                        fadeIntensity = 1;
-                    }
                     if(faderEffectsRenderer) {
                         faderEffectsRenderer.render(fadeIntensity,true);
                     }
                 } else {
-                    fadeIntensity = 1 - (timestamp - rendererState.fader.start) / rendererState.fader.time;
-                    if(fadeIntensity < 0) {
+                    if(fadeIntensity >= 1) {
                         rendererState.fader.delta = 0;
                         rendererState.fader.oninEnd();
                         return;
                     }
                     if(faderEffectsRenderer) {
-                        faderEffectsRenderer.render(fadeIntensity,false);
+                        faderEffectsRenderer.render(1-fadeIntensity,false);
                     }
                 }
-
-                if(fadeIntensity === 1 && rendererState.fader.delta === 1) {
+                if(fadeIntensity >= 1 && rendererState.fader.delta === 1) {
                     rendererState.fader.delta = 0;
                     rendererState.fader.onoutEnd();
                 }
