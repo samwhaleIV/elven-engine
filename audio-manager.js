@@ -227,8 +227,6 @@ function playMusicWithIntro(loopName,introName,withLoop=true) {
             startSyncTime = audioContext.currentTime + 0.01;
         }
 
-        const startedTime = performance.now();
-
         musicNode.onended = () => {
             if(!musicNodes[introName] || !activeLoops[loopID]) {
                 return;

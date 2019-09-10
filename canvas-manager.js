@@ -215,17 +215,32 @@ function routePointerEvent(event,type) {
             break;
     }
 }
+let capturingPointer = false;
 canvas.onpointerup = event => {
-    if(touchEnabled(event) && event.button === 0) {
-        routePointerEvent(event,pointerEventTypes.pointerUp);
+    if(event.button === 0) {
+        capturingPointer = false;
+        if(touchEnabled(event)) {
+            routePointerEvent(event,pointerEventTypes.pointerUp);
+        }
     }
 }
 canvas.onpointerdown = event => {
-    if(touchEnabled(event) && event.button === 0) {
-        routePointerEvent(event,pointerEventTypes.pointerDown);
+    if(event.button === 0) {
+        capturingPointer = true;
+        if(touchEnabled(event)) {
+            routePointerEvent(event,pointerEventTypes.pointerDown);
+        }
+    }
+}
+function cancelPointerEvent(event) {
+    if(capturingPointer && touchEnabled(event)) {
+        capturingPointer = false;
+        routePointerEvent(event,pointerEventTypes.pointerUp);
     }
 }
 canvas.onpointermove = processMouseMove;
+canvas.onpointerleave = cancelPointerEvent;
+
 function processMouseMove(event) {
     if(touchEnabledMove(event)) {
         const relativeEventLocation = getRelativeEventLocation(
