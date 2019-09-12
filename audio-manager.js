@@ -1,5 +1,6 @@
 "use strict";
 const audioContext = new (window.AudioContext||window.webkitAudioContext);
+const OSCILLATOR_VOLUME = 0.2;
 
 let musicVolume = musicNodeGain;
 let soundVolume = soundGain;
@@ -320,6 +321,40 @@ function stopMusic() {
     for(let key in musicNodes) {
         deleteTrack(key);
     }
+}
+
+let lastTone = null;
+function playTone(frequency,duration) {
+    const oscillator = audioContext.createOscillator();
+    oscillator.type = "square";
+    const oscillatorGain = audioContext.createGain();
+
+    oscillator.connect(oscillatorGain);
+    oscillatorGain.connect(soundOutputNode);
+
+    const startTime = audioContext.currentTime;
+    const endTime = startTime + duration;
+
+    oscillatorGain.gain.setValueAtTime(OSCILLATOR_VOLUME,startTime);
+    oscillatorGain.gain.exponentialRampToValueAtTime(0.00000001,endTime);
+    oscillator.frequency.setValueAtTime(frequency,startTime);
+    oscillator.start(startTime);
+    oscillator.stop(endTime);
+    if(lastTone) {
+        lastTone.stop(audioContext.currentTime);
+    }
+    lastTone = oscillator;
+}
+function playTonesScaled(pitchScale,durationScale,timeScale,toneMap) {
+    for(let i = 0;i<toneMap.length;i+=3) {
+        const pitch = toneMap[i] * pitchScale;
+        const duration = toneMap[i+1] * durationScale;
+        const time = toneMap[i+2] / timeScale;
+        setTimeout(playTone,time,pitch,duration);
+    }
+}
+function playTones(...toneMap) {
+    playTonesScaled(1,1,1,toneMap);
 }
 
 function playSound(name,duration) {
