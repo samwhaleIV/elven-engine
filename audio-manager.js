@@ -170,7 +170,9 @@ function fadeOutSongs(musicFadeOutDuration,callback) {
     clearMusicEnvironment();
     const endTime = audioContext.currentTime + (musicFadeOutDuration / 1000);
     for(let key in musicNodes) {
-        musicNodes[key].volumeControl.gain.linearRampToValueAtTime(0,endTime);
+        const node = musicNodes[key];
+        node.volumeControl.gain.linearRampToValueAtTime(0,endTime);
+        preventPotentialTrackLoop(node);
     }
     setTimeout(()=>{
         for(let key in musicNodes) {
@@ -229,7 +231,8 @@ function playMusicWithIntro(loopName,introName,withLoop=true) {
         }
 
         musicNode.onended = () => {
-            if(!musicNodes[introName] || !activeLoops[loopID]) {
+            const introLoop = musicNodes[introName];
+            if(!introLoop || introLoop.doNotContinueAtLoop || !activeLoops[loopdID]) {
                 return;
             }
             const loopMusicNode = audioContext.createBufferSource();
@@ -296,6 +299,10 @@ function playMusic(name,withLoop=true) {
             return buffer.duration;
         }
     }
+}
+
+function preventPotentialTrackLoop(node) {
+    node.doNotContinueAtLoop = true;
 }
 
 function deleteTrack(name) {
