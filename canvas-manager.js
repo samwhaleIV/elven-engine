@@ -265,8 +265,20 @@ let keyBindings = (function(){
         return JSON.parse(DEFAULT_KEY_BINDS);
     }
 })();
-const saveKeyBinds = () => {
-    localStorage.setItem(KEY_BINDS_KEY,JSON.stringify(keyBindings));
+let nextKeyBindWatchID = 0;
+const keyBindWatchers = {};
+const addKeyBindWatch = callback => {
+    const ID = nextKeyBindWatchID;
+    nextKeyBindWatchID++;
+    keyBindWatchers[ID] = callback;
+    return ID;
+}
+const removeKeyBindWatch = ID => {
+    delete keyBindWatchers[ID];
+}
+const notifyKeyBindWatchers = () => {
+    const watchers = Object.values(keyBindWatchers);
+    watchers.forEach(watch=>watch());
 }
 const setKeyBinds = newBinds => {
     let hasFullscreen = false;
@@ -283,7 +295,8 @@ const setKeyBinds = newBinds => {
         newBinds["F11"] = kc.fullscreen;
     }
     keyBindings = newBinds;
-    saveKeyBinds();
+    localStorage.setItem(KEY_BINDS_KEY,JSON.stringify(keyBindings));
+    notifyKeyBindWatchers();
 }
 const rewriteKeyboardEventCode = eventCode => {
     if(kc_inverse[eventCode]) {
