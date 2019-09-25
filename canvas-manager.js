@@ -217,6 +217,8 @@ function routePointerEvent(event,type) {
 }
 let capturingPointer = false;
 canvas.onpointerup = event => {
+    event.preventDefault();
+    event.stopPropagation();
     if(event.button === 0) {
         capturingPointer = false;
         if(touchEnabled(event)) {
@@ -225,6 +227,8 @@ canvas.onpointerup = event => {
     }
 }
 canvas.onpointerdown = event => {
+    event.preventDefault();
+    event.stopPropagation();
     if(event.button === 0) {
         capturingPointer = true;
         if(touchEnabled(event)) {
@@ -233,6 +237,8 @@ canvas.onpointerdown = event => {
     }
 }
 function cancelPointerEvent(event) {
+    event.preventDefault();
+    event.stopPropagation();
     if(capturingPointer && touchEnabled(event)) {
         capturingPointer = false;
         routePointerEvent(event,pointerEventTypes.pointerUp);
@@ -242,6 +248,8 @@ canvas.onpointermove = processMouseMove;
 canvas.onpointerleave = cancelPointerEvent;
 
 function processMouseMove(event) {
+    event.preventDefault();
+    event.stopPropagation();
     if(touchEnabledMove(event)) {
         const relativeEventLocation = getRelativeEventLocation(
             event
@@ -306,12 +314,16 @@ const rewriteKeyboardEventCode = eventCode => {
 }
 
 const keyup = event => {
+    event.preventDefault();
+    event.stopPropagation();
     if(!keyinputEnabled()) {
         return;
     }
     routeKeyEvent(rewriteKeyboardEventCode(event.code),keyEventTypes.keyUp);
 }
 const keydown = event => {
+    event.preventDefault();
+    event.stopPropagation();
     const keyCode = rewriteKeyboardEventCode(event.code)
     switch(keyCode) {
         case kc.fullscreen:
