@@ -44,64 +44,64 @@ function processButton(name,action,endAction,button,timestamp,isAxis) {
     }
 };
 const leftBumperDown = () => {
-    keydown(leftBumperCode);
+    sendKeyDown(leftBumperCode);
 };
 const rightBumperDown = () => {
-    keydown(rightBumperCode);
+    sendKeyDown(rightBumperCode);
 };
 const aButtonDown = () => {
-    keydown(aButtonCode);
+    sendKeyDown(aButtonCode);
 };
 const yButtonDown = () => {
-    keydown(yButtonCode);
+    sendKeyDown(yButtonCode);
 };
 const bButtonDown = () => {
-    keydown(bButtonCode);
+    sendKeyDown(bButtonCode);
 };
 const upButtonDown = () => {
-    keydown(upButtonCode);
+    sendKeyDown(upButtonCode);
 };
 const downButtonDown = () => {
-    keydown(downButtonCode);
+    sendKeyDown(downButtonCode);
 };
 const leftButtonDown = () => {
-    keydown(leftButtonCode);
+    sendKeyDown(leftButtonCode);
 };
 const rightButtonDown = () => {
-    keydown(rightButtonCode);
+    sendKeyDown(rightButtonCode);
 };
 const startButtonDown = () => {
-    keydown(startButtonCode);
+    sendKeyDown(startButtonCode);
 };
 const leftBumperUp = () => {
-    keyup(leftBumperCode);
+    sendKeyUp(leftBumperCode);
 };
 const rightBumperUp = () => {
-    keyup(rightBumperCode);
+    sendKeyUp(rightBumperCode);
 };
 const aButtonUp = () => {
-    keyup(aButtonCode);
+    sendKeyUp(aButtonCode);
 };
 const yButtonUp = () => {
-    keyup(yButtonCode);
+    sendKeyUp(yButtonCode);
 };
 const bButtonUp = () => {
-    keyup(bButtonCode);
+    sendKeyUp(bButtonCode);
 };
 const upButtonUp = () => {
-    keyup(upButtonCode);
+    sendKeyUp(upButtonCode);
 };
 const downButtonUp = () => {
-    keyup(downButtonCode);
+    sendKeyUp(downButtonCode);
 };
 const leftButtonUp = () => {
-    keyup(leftButtonCode);
+    sendKeyUp(leftButtonCode);
 };
 const rightButtonUp = () => {
-    keyup(rightButtonCode);
+    sendKeyUp(rightButtonCode);
 };
 const startButtonUp = () => {
-    keyup(startButtonCode);
+    sendKeyUp(startButtonCode);
 };
 
 function processGamepad(gamepad,timestamp=0) {

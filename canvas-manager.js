@@ -1,64 +1,16 @@
 "use strict";
 const canvas = document.getElementById("canvas");
+let pictureModeElementTimeout = null;
 
-let fullWidth;
-let fullHeight;
-let halfWidth;
-let halfHeight;
-let doubleWidth;
-let doubleHeight;
-let largestDimension;
-let smallestDimension;
-let halfLargestDimension;
-let halfSmallestDimension;
-let aspectRatio;
-let greaterWidth;
-let greaterHeight;
-let widthNormal;
+let rendererState = null;
+let animationFrame = null;
+let paused = true;
 
-let adaptiveTextScale;
-let adaptiveTextSpacing;
-
-let rainbowGradient;
-
-function setSizeConstants() {
-    fullWidth = canvas.width;
-    fullHeight = canvas.height;
-    halfWidth = fullWidth / 2;
-    halfHeight = fullHeight / 2;
-    doubleWidth = fullWidth * 2;
-    doubleHeight = fullHeight * 2;
-    if(fullWidth > fullHeight) {
-        largestDimension = fullWidth;
-        smallestDimension = fullHeight;
-    } else {
-        largestDimension = fullHeight;
-        smallestDimension = fullWidth;
-    }
-    halfLargestDimension = largestDimension / 2;
-    halfSmallestDimension = smallestDimension / 2;
-    aspectRatio = fullWidth / fullHeight;
-    if(aspectRatio >= 1) {
-        greaterWidth = true;
-        greaterHeight = false;
-    } else {
-        greaterWidth = false;
-        greaterHeight = true;
-    }
-    widthNormal = fullWidth / maxHorizontalResolution;
-}
-
-function createRainbowGradient() {
-    const gradient = context.createLinearGradient(fullWidth*0.3,0,fullWidth*0.7,0);
-    gradient.addColorStop(0,"red");
-    gradient.addColorStop(1/6,"orange");
-    gradient.addColorStop(2/6,"yellow");
-    gradient.addColorStop(3/6,"green");
-    gradient.addColorStop(4/6,"blue");
-    gradient.addColorStop(5/6,"indigo");
-    gradient.addColorStop(1,"violet");
-    return gradient;
-}
+let capturingPointer = false;
+let capturingAltPointer = false;
+let sizeApplicationDeferred = false;
+let lastRelativeX = -1;
+let lastRelativeY = -1;
 
 const heightByWidth = internalHeight / internalWidth;
 let widthByHeight = internalWidth / internalHeight;
@@ -77,8 +29,27 @@ if(typeof(require) !== "undefined") {
 if(ENV_FLAGS.DO_STEAM_SETUP) {
     steamSetup();
 }
-let lastRelativeX = -1;
-let lastRelativeY = -1;
+
+let fullWidth;
+let fullHeight;
+let halfWidth;
+let halfHeight;
+let doubleWidth;
+let doubleHeight;
+let largestDimension;
+let smallestDimension;
+let halfLargestDimension;
+let halfSmallestDimension;
+let aspectRatio;
+let greaterWidth;
+let greaterHeight;
+let widthNormal;
+let adaptiveTextScale;
+let adaptiveTextSpacing;
+let rainbowGradient;
+
+const pictureModeElement = document.getElementById("picture-mode-element");
+
 const keyEventModes = {
     downOnly: Symbol("downOnly"),
     none: Symbol("none"),
@@ -97,11 +68,6 @@ const pointerEventTypes = {
     pointerUp: Symbol("pointerUp"),
     pointerDown: Symbol("pointerDown")
 }
-let pointerEventMode = keyEventModes.none;
-let keyEventMode = pointerEventModes.none;
-
-const pictureModeElement = document.getElementById("picture-mode-element");
-
 const sizeModes = {
     fit: {
         name: "fit",
@@ -123,14 +89,11 @@ const sizeModes = {
         displayName: "none"
     }
 }
-
+let pointerEventMode = pointerEventModes.none;
+let altPointerEventMode = pointerEventModes.none;
+let keyEventMode = keyEventModes.none;
 const defaultSizeMode = sizeModes.stretch.name;
 let canvasSizeMode = localStorage.getItem("canvasSizeMode") || defaultSizeMode;
-let pictureModeElementTimeout = null;
-
-let rendererState = null;
-let animationFrame = null;
-let paused = true;
 
 function getRelativeEventLocation(event) {
     return {
@@ -180,76 +143,91 @@ function routeKeyEvent(keyCode,type) {
             break;
     }
 }
-function routePointerEvent(event,type) {
-    const relativeEventLocation = getRelativeEventLocation(
-        event
-    );
+function routePointerEvent(event,type,alt=false) {
+    const relativeEventLocation = getRelativeEventLocation(event);
     lastRelativeX = relativeEventLocation.x;
     lastRelativeY = relativeEventLocation.y;
-    switch(pointerEventMode) {
+    switch(alt?altPointerEventMode:pointerEventMode) {
         case pointerEventModes.none:
             break;
         case pointerEventModes.upOnly:
             if(type === pointerEventTypes.pointerUp) {
-                rendererState.processClick(
-                    relativeEventLocation.x,
-                    relativeEventLocation.y
+                (alt?rendererState.processClickAlt:rendererState.processClick)(
+                    lastRelativeX,lastRelativeY
                 );
             }
             break;
         case pointerEventModes.upAndDown:
             switch(type) {
                 case pointerEventTypes.pointerUp:
-                    rendererState.processClickEnd(
-                        relativeEventLocation.x,
-                        relativeEventLocation.y
+                    (alt?rendererState.processClickEndAlt:rendererState.processClickEnd)(
+                        lastRelativeX,lastRelativeY
                     );
                     break;
                 case pointerEventTypes.pointerDown:
-                    rendererState.processClick(
-                        relativeEventLocation.x,
-                        relativeEventLocation.y
+                    (alt?rendererState.processClickAlt:rendererState.processClick)(
+                        lastRelativeX,lastRelativeY
                     );
                     break;
             }
             break;
     }
 }
-let capturingPointer = false;
 canvas.onpointerup = event => {
-    event.preventDefault();
-    event.stopPropagation();
+    stopEventBubbling(event);
     if(event.button === 0) {
         capturingPointer = false;
         if(touchEnabled(event)) {
-            routePointerEvent(event,pointerEventTypes.pointerUp);
+            routePointerEvent(event,pointerEventTypes.pointerUp,false);
+        }
+    } else if(event.button === 2) {
+        if(touchEnabled(event)) {
+            capturingAltPointer = false;
+            routePointerEvent(event,pointerEventTypes.pointerUp,true);
         }
     }
 }
 canvas.onpointerdown = event => {
-    event.preventDefault();
-    event.stopPropagation();
+    stopEventBubbling(event);
     if(event.button === 0) {
         capturingPointer = true;
         if(touchEnabled(event)) {
-            routePointerEvent(event,pointerEventTypes.pointerDown);
+            routePointerEvent(event,pointerEventTypes.pointerDown,false);
+        }
+    } else if(event.button === 2) {
+        if(touchEnabled(event)) {
+            capturingAltPointer = true;
+            routePointerEvent(event,pointerEventTypes.pointerDown,true);
         }
     }
 }
 function cancelPointerEvent(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    if(capturingPointer && touchEnabled(event)) {
-        capturingPointer = false;
-        routePointerEvent(event,pointerEventTypes.pointerUp);
+    stopEventBubbling(event);
+    if(touchEnabled(event)) {
+        if(capturingPointer) {
+            capturingPointer = false;
+            if(pointerEventMode === pointerEventModes.upAndDown) {
+                routePointerEvent(event,pointerEventTypes.pointerUp,false);
+            }
+        }
+        if(capturingAltPointer) {
+            capturingAltPointer = false;
+            if(altPointerEventMode === pointerEventModes.upAndDown) {
+                routePointerEvent(event,pointerEventTypes.pointerUp,true);
+            }
+        }
     }
+}
+function stopEventBubbling(event) {
+    event.stopPropagation();
+    event.preventDefault();
 }
 canvas.onpointermove = processMouseMove;
 canvas.onpointerleave = cancelPointerEvent;
+document.body.oncontextmenu = stopEventBubbling;
 
 function processMouseMove(event) {
-    event.preventDefault();
-    event.stopPropagation();
+    stopEventBubbling(event);
     if(touchEnabledMove(event)) {
         const relativeEventLocation = getRelativeEventLocation(
             event
@@ -264,7 +242,7 @@ function processMouseMove(event) {
         }
     }
 }
-let keyBindings = (function(){
+let keybindings = (function(){
     const savedBinds = localStorage.getItem(KEY_BINDS_KEY);
     if(savedBinds) {
         return JSON.parse(savedBinds);
@@ -273,22 +251,22 @@ let keyBindings = (function(){
         return JSON.parse(DEFAULT_KEY_BINDS);
     }
 })();
-let nextKeyBindWatchID = 0;
-const keyBindWatchers = {};
-const addKeyBindWatch = callback => {
-    const ID = nextKeyBindWatchID;
-    nextKeyBindWatchID++;
-    keyBindWatchers[ID] = callback;
+let nextKeybindWatchID = 0;
+const keybindWatchers = {};
+const addKeybindWatch = callback => {
+    const ID = nextKeybindWatchID;
+    nextKeybindWatchID++;
+    keybindWatchers[ID] = callback;
     return ID;
 }
-const removeKeyBindWatch = ID => {
-    delete keyBindWatchers[ID];
+const removeKeybindWatch = ID => {
+    delete keybindWatchers[ID];
 }
-const notifyKeyBindWatchers = () => {
-    const watchers = Object.values(keyBindWatchers);
+const notifyKeybindWatchers = () => {
+    const watchers = Object.values(keybindWatchers);
     watchers.forEach(watch=>watch());
 }
-const setKeyBinds = newBinds => {
+const setKeybinds = newBinds => {
     let hasFullscreen = false;
     let usesF11 = false;
     Object.entries(newBinds).forEach(entry => {
@@ -302,28 +280,25 @@ const setKeyBinds = newBinds => {
     if(!hasFullscreen && !usesF11) {
         newBinds["F11"] = kc.fullscreen;
     }
-    keyBindings = newBinds;
-    localStorage.setItem(KEY_BINDS_KEY,JSON.stringify(keyBindings));
-    notifyKeyBindWatchers();
+    keybindings = newBinds;
+    localStorage.setItem(KEY_BINDS_KEY,JSON.stringify(keybindings));
+    notifyKeybindWatchers();
 }
 const rewriteKeyboardEventCode = eventCode => {
     if(kc_inverse[eventCode]) {
         return eventCode;
     }
-    return keyBindings[eventCode];
+    return keybindings[eventCode];
 }
-
-const keyup = event => {
-    event.preventDefault();
-    event.stopPropagation();
+const sendKeyUp = event => {
+    stopEventBubbling(event);
     if(!keyinputEnabled()) {
         return;
     }
     routeKeyEvent(rewriteKeyboardEventCode(event.code),keyEventTypes.keyUp);
 }
-const keydown = event => {
-    event.preventDefault();
-    event.stopPropagation();
+const sendKeyDown = event => {
+    stopEventBubbling(event);
     const keyCode = rewriteKeyboardEventCode(event.code)
     switch(keyCode) {
         case kc.fullscreen:
@@ -350,8 +325,48 @@ const keydown = event => {
     }
     routeKeyEvent(keyCode,keyEventTypes.keyDown);
 };
-window.addEventListener("keydown",keydown);
-window.addEventListener("keyup",keyup);
+window.addEventListener("keydown",sendKeyDown);
+window.addEventListener("keyup",sendKeyUp);
+window.addEventListener("resize",applySizeMode);
+
+function createRainbowGradient() {
+    const gradient = context.createLinearGradient(fullWidth*0.3,0,fullWidth*0.7,0);
+    gradient.addColorStop(0,"red");
+    gradient.addColorStop(1/6,"orange");
+    gradient.addColorStop(2/6,"yellow");
+    gradient.addColorStop(3/6,"green");
+    gradient.addColorStop(4/6,"blue");
+    gradient.addColorStop(5/6,"indigo");
+    gradient.addColorStop(1,"violet");
+    return gradient;
+}
+
+function setSizeConstants() {
+    fullWidth = canvas.width;
+    fullHeight = canvas.height;
+    halfWidth = fullWidth / 2;
+    halfHeight = fullHeight / 2;
+    doubleWidth = fullWidth * 2;
+    doubleHeight = fullHeight * 2;
+    if(fullWidth > fullHeight) {
+        largestDimension = fullWidth;
+        smallestDimension = fullHeight;
+    } else {
+        largestDimension = fullHeight;
+        smallestDimension = fullWidth;
+    }
+    halfLargestDimension = largestDimension / 2;
+    halfSmallestDimension = smallestDimension / 2;
+    aspectRatio = fullWidth / fullHeight;
+    if(aspectRatio >= 1) {
+        greaterWidth = true;
+        greaterHeight = false;
+    } else {
+        greaterWidth = false;
+        greaterHeight = true;
+    }
+    widthNormal = fullWidth / maxHorizontalResolution;
+}
 
 function applyLowResolutionTextAdapations() {
     adaptiveTextScale = lowResolutionAdaptiveTextScale;
@@ -366,8 +381,6 @@ function applyMediumResolutionTextAdapations() {
     adaptiveTextScale = mediumResolutionAdaptiveTextScale;
     adaptiveTextSpacing = mediumResolutionAdaptiveTextSpacing;
 }
-
-let sizeApplicationDeferred = false;
 function applySizeMode(forced=false) {
     if(!rendererState) {
         return;
@@ -534,7 +547,6 @@ function cycleSizeMode() {
     localStorage.setItem("canvasSizeMode",newMode);
     console.log(`Canvas handler: Set size mode to '${newMode}'`);
 }
-
 const render = (function(){
     if(ENV_FLAGS.CONTROLLER_DISABLED) {
         return function render(timestamp) {
@@ -599,7 +611,6 @@ function startRenderer() {
     tryRendererStateStart(performance.now());
     console.log("Canvas handler: Renderer started for the first time.");
 }
-
 function setRendererState(newRendererState) {
     rendererState = newRendererState;
     if(!rendererState.fader) {
@@ -626,8 +637,16 @@ function setRendererState(newRendererState) {
         console.warn("Canvas handler: This renderer state is possibly misconfigured for pointer events");
         pointerEventMode = pointerEventModes.none;
     }
+    if(rendererState.processClickAlt) {
+        if(rendererState.processClickEndAlt) {
+            altPointerEventMode = pointerEventModes.upAndDown;
+        } else {
+            altPointerEventMode = pointerEventModes.upOnly;
+        }
+    } else {
+        altPointerEventMode = pointerEventModes.none;
+    }
 }
-
 function pauseRenderer() {
     paused = true;
     console.log("Canvas handler: Paused renderer");
@@ -636,7 +655,6 @@ function resumeRenderer() {
     paused = false;
     console.log("Canvas handler: Resumed renderer");
 }
-
 function forceRender() {
     if(!rendererState) {
         console.error("Error: Missing renderer state; the renderer cannot render.");
@@ -647,6 +665,3 @@ function forceRender() {
         context,performance.now()
     );
 }
-window.addEventListener("resize",function(){
-    applySizeMode(false);
-});
