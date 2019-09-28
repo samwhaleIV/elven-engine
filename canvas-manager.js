@@ -661,7 +661,6 @@ function forceRender() {
         return;
     }
     console.log("Canvas handler: Forced render");
-    rendererState.render(
-        context,performance.now()
-    );
+    window.cancelAnimationFrame(animationFrame);
+    render(performance.now());
 }
