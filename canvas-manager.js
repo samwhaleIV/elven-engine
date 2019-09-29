@@ -152,7 +152,8 @@ function routePointerEvent(event,type,alt=false) {
             break;
         case pointerEventModes.upOnly:
             if(type === pointerEventTypes.pointerUp) {
-                (alt?rendererState.processClickAlt:rendererState.processClick)(
+                (alt?rendererState.processClickAlt:rendererState.processClick).call(
+                    rendererState,
                     lastRelativeX,lastRelativeY
                 );
             }
@@ -160,12 +161,14 @@ function routePointerEvent(event,type,alt=false) {
         case pointerEventModes.upAndDown:
             switch(type) {
                 case pointerEventTypes.pointerUp:
-                    (alt?rendererState.processClickEndAlt:rendererState.processClickEnd)(
+                    (alt?rendererState.processClickEndAlt:rendererState.processClickEnd).call(
+                        rendererState,
                         lastRelativeX,lastRelativeY
                     );
                     break;
                 case pointerEventTypes.pointerDown:
-                    (alt?rendererState.processClickAlt:rendererState.processClick)(
+                    (alt?rendererState.processClickAlt:rendererState.processClick).call(
+                        rendererState,
                         lastRelativeX,lastRelativeY
                     );
                     break;
