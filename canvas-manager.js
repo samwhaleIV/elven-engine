@@ -224,7 +224,9 @@ function stopEventBubbling(event) {
 }
 canvas.onpointermove = processMouseMove;
 canvas.onpointerleave = cancelPointerEvent;
-document.body.oncontextmenu = stopEventBubbling;
+if(!ENV_FLAGS.NO_CONTEXT_MENU) {
+    document.body.oncontextmenu = stopEventBubbling;
+}
 
 function processMouseMove(event) {
     stopEventBubbling(event);
