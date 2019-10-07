@@ -307,19 +307,11 @@ const sendKeyUp = event => {
     routeKeyEvent(rewriteKeyboardEventCode(event.code),keyEventTypes.keyUp);
 }
 const sendKeyDown = event => {
-    stopEventBubbling(event);
-    const keyCode = rewriteKeyboardEventCode(event.code)
+    const keyCode = rewriteKeyboardEventCode(event.code);
     switch(keyCode) {
         case kc.fullscreen:
             if(!electron) {
-                if(document.fullscreenEnabled) {
-                    if(document.fullscreenElement) {
-                        document.exitFullscreen();
-                    } else {
-                        document.body.requestFullscreen();
-                    }
-                }
-                break;
+                return;
             }
             const isFullScreen = !electronWindow.isFullScreen();
             electronWindow.setFullScreen(isFullScreen);
@@ -336,6 +328,7 @@ const sendKeyDown = event => {
             cycleSizeMode();
             break;
     }
+    stopEventBubbling(event);
     if(!keyinputEnabled()) {
         return;
     }
