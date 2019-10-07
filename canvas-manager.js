@@ -18,7 +18,9 @@ let widthByHeight = internalWidth / internalHeight;
 const backgroundCanvas = document.getElementById("background-canvas");
 const context = canvas.getContext("2d",{alpha:false});
 const backgroundContext = backgroundCanvas.getContext("2d",{alpha:false});
-backgroundContext.fillStyle = "black";
+if(!ENV_FLAGS.STATIC_BACKGROUND) {
+    backgroundContext.fillStyle = "black";
+}
 
 let electron = null;
 let electronWindow = null;
@@ -557,30 +559,59 @@ function cycleSizeMode() {
     console.log(`Canvas handler: Set size mode to '${newMode}'`);
 }
 const render = (function(){
-    if(ENV_FLAGS.CONTROLLER_DISABLED) {
-        return function render(timestamp) {
-            animationFrame = window.requestAnimationFrame(render); 
-            backgroundContext.fillRect(0,0,1,1);
-            if(!paused) {
-                rendererState.render(timestamp);
-                rendererState.fader.render(timestamp);
+    if(ENV_FLAGS.STATIC_BACKGROUND) {
+        if(ENV_FLAGS.CONTROLLER_DISABLED) {
+            return function render(timestamp) {
+                animationFrame = window.requestAnimationFrame(render); 
+                if(!paused) {
+                    rendererState.render(timestamp);
+                    rendererState.fader.render(timestamp);
+                }
+            }
+        } else {
+            return function render(timestamp) {
+                animationFrame = window.requestAnimationFrame(render); 
+                if(!paused) {
+                    rendererState.render(timestamp);
+                    rendererState.fader.render(timestamp);
+                    const gamepads = navigator.getGamepads();
+                    let i = 0;
+                    while(i < gamepads.length) {
+                        if(gamepads[i] && gamepads[i].mapping === "standard") {
+                            processGamepad(gamepads[i],timestamp);
+                            i = gamepads.length;
+                        }
+                        i++;
+                    }
+                }
             }
         }
     } else {
-        return function render(timestamp) {
-            animationFrame = window.requestAnimationFrame(render); 
-            backgroundContext.fillRect(0,0,1,1);
-            if(!paused) {
-                rendererState.render(timestamp);
-                rendererState.fader.render(timestamp);
-                const gamepads = navigator.getGamepads();
-                let i = 0;
-                while(i < gamepads.length) {
-                    if(gamepads[i] && gamepads[i].mapping === "standard") {
-                        processGamepad(gamepads[i],timestamp);
-                        i = gamepads.length;
+        if(ENV_FLAGS.CONTROLLER_DISABLED) {
+            return function render(timestamp) {
+                animationFrame = window.requestAnimationFrame(render); 
+                backgroundContext.fillRect(0,0,1,1);
+                if(!paused) {
+                    rendererState.render(timestamp);
+                    rendererState.fader.render(timestamp);
+                }
+            }
+        } else {
+            return function render(timestamp) {
+                animationFrame = window.requestAnimationFrame(render); 
+                backgroundContext.fillRect(0,0,1,1);
+                if(!paused) {
+                    rendererState.render(timestamp);
+                    rendererState.fader.render(timestamp);
+                    const gamepads = navigator.getGamepads();
+                    let i = 0;
+                    while(i < gamepads.length) {
+                        if(gamepads[i] && gamepads[i].mapping === "standard") {
+                            processGamepad(gamepads[i],timestamp);
+                            i = gamepads.length;
+                        }
+                        i++;
                     }
-                    i++;
                 }
             }
         }
