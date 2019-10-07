@@ -338,7 +338,7 @@ const sendKeyDown = event => {
 };
 window.addEventListener("keydown",sendKeyDown);
 window.addEventListener("keyup",sendKeyUp);
-window.addEventListener("resize",applySizeMode);
+window.addEventListener("resize",()=>applySizeMode(false));
 
 function createRainbowGradient() {
     const gradient = context.createLinearGradient(fullWidth*0.3,0,fullWidth*0.7,0);
@@ -570,7 +570,7 @@ const render = (function(){
             }
         } else {
             return function render(timestamp) {
-                animationFrame = window.requestAnimationFrame(render); 
+                animationFrame = window.requestAnimationFrame(render);
                 if(!paused) {
                     rendererState.render(timestamp);
                     rendererState.fader.render(timestamp);
