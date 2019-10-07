@@ -222,8 +222,12 @@ function cancelPointerEvent(event) {
     }
 }
 function stopEventBubbling(event) {
-    event.stopPropagation();
-    event.preventDefault();
+    if(event.preventDefault) {
+        event.preventDefault();
+    }
+    if(event.stopPropagation) {
+        event.stopPropagation();
+    }
 }
 canvas.onpointermove = processMouseMove;
 canvas.onpointerleave = cancelPointerEvent;
@@ -308,6 +312,13 @@ const sendKeyDown = event => {
     switch(keyCode) {
         case kc.fullscreen:
             if(!electron) {
+                if(document.fullscreenEnabled) {
+                    if(document.fullscreenElement) {
+                        document.exitFullscreen();
+                    } else {
+                        document.body.requestFullscreen();
+                    }
+                }
                 break;
             }
             const isFullScreen = !electronWindow.isFullScreen();

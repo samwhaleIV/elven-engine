@@ -38,7 +38,7 @@ const kc = {
 const kc_inverse = {};
 Object.entries(kc).forEach(entry=>{
     kc_inverse[entry[1]] = entry[0];
-})
+});
 let leftBumperCode = {code:kc.nav_left};
 let rightBumperCode = {code:kc.nav_right};
 let aButtonCode = {code:kc.accept};
