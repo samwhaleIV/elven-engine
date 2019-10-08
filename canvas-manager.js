@@ -338,7 +338,7 @@ const sendKeyDown = event => {
 };
 window.addEventListener("keydown",sendKeyDown);
 window.addEventListener("keyup",sendKeyUp);
-window.addEventListener("resize",()=>applySizeMode(false));
+window.addEventListener("resize",applySizeMode.bind(this,false));
 
 function createRainbowGradient() {
     const gradient = context.createLinearGradient(fullWidth*0.3,0,fullWidth*0.7,0);

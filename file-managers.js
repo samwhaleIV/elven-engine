@@ -84,7 +84,7 @@ const ImageManager = {
         for(let i = 0;i<ImagePaths.length;i++) {
             const image = new Image();
             (image=>{
-                image.onload = () => {
+                image.onload = async () => {
                     let name;
                     switch(imageIndexMode) {
                         default:
@@ -108,9 +108,17 @@ const ImageManager = {
                             }
                             break;
                     }
-                    imageDictionary[name] = image;
+                    const settings = Object.assign({
+                        resizeWidth: image.width,
+                        resizeHeight: image.height
+                    },IMAGE_TO_BITMAP_SETTINGS);
+                    const bitmap = await createImageBitmap(
+                        image,0,0,image.width,image.height,settings
+                    );
+                    bitmap.name = name;
+                    imageDictionary[name] = bitmap;
                     if(++loadedImages === ImagePaths.length) {
-                        console.log("Image manager: All images loaded");
+                        console.log("Image manager: All images loaded and converted to bitmaps");
                         ImageManager.imagesLoaded = true;
                         if(SoundManager.soundsLoaded) {
                             callback();

@@ -110,5 +110,12 @@ const popupControlCharacters = {
     " ": true
 }
 popupControlCharacters[ellipsis] = true;
+const IMAGE_TO_BITMAP_SETTINGS = {
+    imageOrientation: "none",
+    //Premultiply has no observed performance changes
+    premultiplyAlpha: "premultiply",
+    colorSpaceConversion: "default",
+    resizeQuality: "pixelated"                   
+};
 
 const MUSIC_FILE_FORMAT = ENV_FLAGS.MUSIC_FILE_FORMAT || "ogg";
