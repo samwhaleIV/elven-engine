@@ -239,7 +239,7 @@ function stopEventBubbling(event) {
 }
 canvas.onpointermove = processMouseMove;
 canvas.onpointerleave = cancelPointerEvent;
-if(!ENV_FLAGS.NO_CONTEXT_MENU) {
+if(ENV_FLAGS.NO_CONTEXT_MENU) {
     document.body.oncontextmenu = stopEventBubbling;
 }
 
@@ -315,6 +315,9 @@ const sendKeyUp = event => {
     routeKeyEvent(rewriteKeyboardEventCode(event.code),keyEventTypes.keyUp);
 }
 const sendKeyDown = event => {
+    if(ENV_FLAGS.ENABLE_DEV_F12 && event.key === "F12") {
+        return;
+    }
     const keyCode = rewriteKeyboardEventCode(event.code);
     switch(keyCode) {
         case kc.fullscreen:
