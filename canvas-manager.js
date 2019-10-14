@@ -16,8 +16,14 @@ const heightByWidth = internalHeight / internalWidth;
 let widthByHeight = internalWidth / internalHeight;
 
 const backgroundCanvas = document.getElementById("background-canvas");
-const context = canvas.getContext("2d",{alpha:false});
-const backgroundContext = backgroundCanvas.getContext("2d",{alpha:false});
+const context = canvas.getContext("2d",{
+    alpha: false,
+    desynchronized: false
+});
+const backgroundContext = backgroundCanvas.getContext("2d",{
+    alpha: false,
+    desynchronized: false
+});
 if(!ENV_FLAGS.STATIC_BACKGROUND) {
     backgroundContext.fillStyle = "black";
 }
