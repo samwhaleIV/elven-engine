@@ -2,6 +2,8 @@
 const PI2 = Math.PI * 2;
 const ellipsis = "…";
 
+let defaultSizeMode = "stretch";
+
 const maxHorizontalResolution = 1920;
 const mediumScaleSnapPoint = 1600;
 const smallScaleSnapPoint = 810;
@@ -31,6 +33,8 @@ const kc = {
     down: "k_down",
     left: "k_left",
     right: "k_right",
+    special_1: "k_special_1",
+    special_2: "k_special_2",
     nav_right: "k_nav_right",
     nav_left: "k_nav_left",
     fullscreen: "k_fullscreen"
@@ -42,29 +46,14 @@ Object.entries(kc).forEach(entry=>{
 let leftBumperCode = {code:kc.nav_left};
 let rightBumperCode = {code:kc.nav_right};
 let aButtonCode = {code:kc.accept};
-let yButtonCode = {code:kc.picture_mode};
+let xButtonCode = {code:kc.special_2};
+let yButtonCode = {code:kc.special_1};
 let bButtonCode = {code:kc.cancel};
 let upButtonCode = {code:kc.up};
 let downButtonCode = {code:kc.down};
 let leftButtonCode = {code:kc.left};
 let rightButtonCode = {code:kc.right};
 let startButtonCode = {code:kc.accept};
-
-const DEFAULT_KEY_BINDS = JSON.stringify({
-    Enter: kc.accept,
-    Escape: kc.cancel,
-    KeyP: kc.picture_mode,
-    Space: kc.open,
-    KeyW: kc.up,
-    KeyD: kc.right,
-    KeyS: kc.down,
-    KeyA: kc.left,
-    KeyN: kc.nav_left,
-    KeyM: kc.nav_right,
-    F11: kc.fullscreen
-});
-const KEY_BINDS_KEY = "UV_KEY_BINDS";
-const VOLUME_STORAGE_KEY = "UV_VOLUME";
 
 const textControlCodes = {
     "\n": /\n/g,

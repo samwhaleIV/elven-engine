@@ -121,7 +121,7 @@ function muteMusic() {
     if(!musicMuted) {
         musicVolumeNode.gain.setValueAtTime(0,audioContext.currentTime);
         musicMuted = true;
-        localStorage.setItem("musicMuted",true);
+        localStorage.setItem(MUSIC_MUTED_KEY,true);
     } else {
         console.warn("Audio manager: Music already muted");
     }
@@ -130,7 +130,7 @@ function muteSound() {
     if(!soundMuted) {
         volumeNode.gain.setValueAtTime(0,audioContext.currentTime);
         soundMuted = true;
-        localStorage.setItem("soundMuted",true);
+        localStorage.setItem(SOUND_MUTED_KEY,true);
     } else {
         console.warn("Audio manager: Sound already muted");
     }
@@ -140,7 +140,7 @@ function unmuteSound() {
     if(soundMuted) {
         volumeNode.gain.setValueAtTime(soundVolume,audioContext.currentTime);
         soundMuted = false;
-        localStorage.setItem("soundMuted",false);
+        localStorage.setItem(SOUND_MUTED_KEY,false);
     } else {
         console.warn("Audio manager: Sound already unmuted");
     }
@@ -150,7 +150,7 @@ function unmuteMusic() {
     if(musicMuted) {
         musicVolumeNode.gain.setValueAtTime(musicVolume,audioContext.currentTime);
         musicMuted = false;
-        localStorage.setItem("musicMuted",false);
+        localStorage.setItem(MUSIC_MUTED_KEY,false);
     } else {
         console.warn("Audio manager: Music already unmuted");
     }
@@ -464,9 +464,9 @@ function addBufferSource (fileName,callback,errorCallback) {
     }
     request.send();
 }
-if(localStorage.getItem("soundMuted") === "true") {
+if(localStorage.getItem(SOUND_MUTED_KEY) === "true") {
     muteSound();
 }
-if(localStorage.getItem("musicMuted") === "true") {
+if(localStorage.getItem(MUSIC_MUTED_KEY) === "true") {
     muteMusic();
 }

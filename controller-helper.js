@@ -52,6 +52,9 @@ const rightBumperDown = () => {
 const aButtonDown = () => {
     sendKeyDown(aButtonCode);
 };
+const xButtonDown = () => {
+    sendKeyDown(xButtonCode);
+}
 const yButtonDown = () => {
     sendKeyDown(yButtonCode);
 };
@@ -82,6 +85,9 @@ const rightBumperUp = () => {
 const aButtonUp = () => {
     sendKeyUp(aButtonCode);
 };
+const xButtonUp = () => {
+    sendKeyUp(xButtonUp);
+}
 const yButtonUp = () => {
     sendKeyUp(yButtonCode);
 };
@@ -109,6 +115,7 @@ function processGamepad(gamepad,timestamp=0) {
     processButton("LeftBumper",leftBumperDown,leftBumperUp,gamepad.buttons[4],timestamp);
     processButton("RightBumper",rightBumperDown,rightBumperUp,gamepad.buttons[5],timestamp);
     processButton("a",aButtonDown,aButtonUp,gamepad.buttons[0],timestamp);
+    processButton("x",xButtonDown,xButtonUp,gamepad.buttons[2],timestamp);
     processButton("y",yButtonDown,yButtonUp,gamepad.buttons[3],timestamp);
     processButton("b",bButtonDown,bButtonUp,gamepad.buttons[1],timestamp);
     processButton("up",upButtonDown,upButtonUp,gamepad.buttons[12],timestamp);

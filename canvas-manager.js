@@ -100,8 +100,14 @@ const sizeModes = {
 let pointerEventMode = pointerEventModes.none;
 let altPointerEventMode = pointerEventModes.none;
 let keyEventMode = keyEventModes.none;
-const defaultSizeMode = sizeModes.stretch.name;
-let canvasSizeMode = localStorage.getItem("canvasSizeMode") || defaultSizeMode;
+let canvasSizeMode = localStorage.getItem(SIZE_MODE_KEY);
+if(!canvasSizeMode) {
+    if(ENV_FLAGS.DEFAULT_SIZE_MODE) {
+        canvasSizeMode = ENV_FLAGS.DEFAULT_SIZE_MODE;
+    } else {
+        canvasSizeMode = "stretch";
+    }
+}
 
 function getRelativeEventLocation(event) {
     return {
@@ -388,16 +394,15 @@ function setSizeConstants() {
     widthNormal = fullWidth / maxHorizontalResolution;
 }
 
-function applyLowResolutionTextAdapations() {
+function applyLowResolutionTextAdaptions() {
     adaptiveTextScale = lowResolutionAdaptiveTextScale;
     adaptiveTextSpacing = lowResolutionAdpativeTextSpacing;
 }
-
 function applyHighResolutionTextAdaptions() {
     adaptiveTextScale = highResolutionAdaptiveTextScale;
     adaptiveTextSpacing = highResolutionAdaptiveTextSpacing;
 }
-function applyMediumResolutionTextAdapations() {
+function applyMediumResolutionTextAdaptions() {
     adaptiveTextScale = mediumResolutionAdaptiveTextScale;
     adaptiveTextSpacing = mediumResolutionAdaptiveTextSpacing;
 }
@@ -465,7 +470,7 @@ function applySizeMode(forced=false) {
         }
         switch(sizeMode) {
             case sizeModes.fit.name:
-                applyLowResolutionTextAdapations();
+                applyLowResolutionTextAdaptions();
                 canvas.width = internalWidth;
                 canvas.height = internalHeight;
                 if(window.innerWidth / window.innerHeight > widthByHeight) {
@@ -496,10 +501,10 @@ function applySizeMode(forced=false) {
                         applyHighResolutionTextAdaptions();
                     } else if(window.innerWidth < smallScaleSnapPoint) {
                         zoomDivider = smallFullScreenZoom;
-                        applyLowResolutionTextAdapations();
+                        applyLowResolutionTextAdaptions();
                     } else if(window.innerWidth < mediumScaleSnapPoint) {
                         zoomDivider = mediumFullScreenZoom;
-                        applyMediumResolutionTextAdapations();
+                        applyMediumResolutionTextAdaptions();
                     } else {
                         applyHighResolutionTextAdaptions();
                     }
@@ -522,7 +527,7 @@ function applySizeMode(forced=false) {
                 canvas.style.top = "0px";
                 break;
             case sizeModes.center.name:
-                applyLowResolutionTextAdapations();
+                applyLowResolutionTextAdaptions();
                 canvas.width = internalWidth;
                 canvas.height = internalHeight;
                 canvas.style.width = canvas.width + "px";
@@ -564,7 +569,7 @@ function cycleSizeMode() {
     },600);
     canvasSizeMode = newMode;
     applySizeMode(false);
-    localStorage.setItem("canvasSizeMode",newMode);
+    localStorage.setItem(SIZE_MODE_KEY,newMode);
     console.log(`Canvas handler: Set size mode to '${newMode}'`);
 }
 const render = (function(){
