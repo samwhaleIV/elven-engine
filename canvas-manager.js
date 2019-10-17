@@ -318,13 +318,21 @@ const sendKeyUp = event => {
     if(!keyinputEnabled()) {
         return;
     }
-    routeKeyEvent(rewriteKeyboardEventCode(event.code),keyEventTypes.keyUp);
+    const keyCode = rewriteKeyboardEventCode(event.code);
+    if(keyCode === undefined) {
+        return;
+    }
+    routeKeyEvent(keyCode,keyEventTypes.keyUp);
 }
 const sendKeyDown = event => {
-    if(ENV_FLAGS.ENABLE_DEV_F12 && event.key === "F12") {
+    if(ENV_FLAGS.ENABLE_F_BUTTONS && (event.key === "F12" || event.key === "F5")) {
         return;
     }
     const keyCode = rewriteKeyboardEventCode(event.code);
+    if(keyCode === undefined) {
+        stopEventBubbling(event);
+        return;
+    }
     switch(keyCode) {
         case kc.fullscreen:
             if(!electron) {
