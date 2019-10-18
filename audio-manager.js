@@ -197,76 +197,79 @@ let activeLoops = {};
 function playMusicWithIntro(loopName,introName,withLoop=true) {
     const introBuffer = audioBuffers[introName];
     const loopBuffer = audioBuffers[loopName];
-    if(!introBuffer || !loopBuffer) {
-        if(!introBuffer) {
-            console.warn(`Audio manager: '${introName}' is missing from audio buffers. Did we fail to load it?`);
-        } else {
-            console.warn(`Audio manager: '${loopName}' is missing from audio buffers. Did we fail to load it?`);
-        }
-    } else {
-        const musicNode = audioContext.createBufferSource();
-        if(startSpeedManifest[introName]) {
-            musicNode.playbackRate.setValueAtTime(startSpeedManifest[introName],audioContext.currentTime);
-        }
-        if(startDetuneManifest[introName]) {
-            musicNode.detune.setValueAtTime(startDetuneManifest[introName],audioContext.currentTime);
-        }
-        musicNode.buffer = introBuffer;
-        musicNode.loop = false;
-        const loopID = getNextIntroID();
-        activeLoops[loopID] = true;
-        musicNode.loopID = loopID;
-
-        musicNode.volumeControl = audioContext.createGain();
-        if(introMuteManifest[introName] && !introMuteManifest[introName].shouldPlay) {
-            musicNode.volumeControl.gain.setValueAtTime(0,audioContext.currentTime);
-        }
-        musicNode.volumeControl.connect(musicOutputNode);
-        musicNode.connect(musicNode.volumeControl);
-
-        if(startSyncTime === null) {
-            startSyncTime = audioContext.currentTime + 0.01;
-        }
-
-        musicNode.onended = () => {
-            if(!musicNodes[introName] || !activeLoops[loopID]) {
-                return;
+    if(!introBuffer) {
+        if(loopBuffer) {
+            const musicNode = audioContext.createBufferSource();
+            if(startSpeedManifest[introName]) {
+                musicNode.playbackRate.setValueAtTime(startSpeedManifest[introName],audioContext.currentTime);
             }
-            const loopMusicNode = audioContext.createBufferSource();
-            if(startSpeedManifest[loopName]) {
-                loopMusicNode.playbackRate.setValueAtTime(startSpeedManifest[loopName],audioContext.currentTime);
+            if(startDetuneManifest[introName]) {
+                musicNode.detune.setValueAtTime(startDetuneManifest[introName],audioContext.currentTime);
             }
-            if(startDetuneManifest[loopName]) {
-                loopMusicNode.detune.setValueAtTime(startDetuneManifest[loopName],audioContext.currentTime);
+            musicNode.buffer = introBuffer;
+            musicNode.loop = false;
+            const loopID = getNextIntroID();
+            activeLoops[loopID] = true;
+            musicNode.loopID = loopID;
+    
+            musicNode.volumeControl = audioContext.createGain();
+            if(introMuteManifest[introName] && !introMuteManifest[introName].shouldPlay) {
+                musicNode.volumeControl.gain.setValueAtTime(0,audioContext.currentTime);
             }
-            loopMusicNode.buffer = loopBuffer;
-            loopMusicNode.loop = withLoop;
-
-            if(loopSyncTime === null) {
-                loopSyncTime = audioContext.currentTime;
+            musicNode.volumeControl.connect(musicOutputNode);
+            musicNode.connect(musicNode.volumeControl);
+    
+            if(startSyncTime === null) {
+                startSyncTime = audioContext.currentTime + 0.01;
             }
     
-            loopMusicNode.volumeControl = audioContext.createGain();
-            if(loopMuteManifest[loopName] && !loopMuteManifest[loopName].shouldPlay) {
-                loopMusicNode.volumeControl.gain.setValueAtTime(0,audioContext.currentTime);
+            musicNode.onended = () => {
+                if(!musicNodes[introName] || !activeLoops[loopID]) {
+                    return;
+                }
+                const loopMusicNode = audioContext.createBufferSource();
+                if(startSpeedManifest[loopName]) {
+                    loopMusicNode.playbackRate.setValueAtTime(startSpeedManifest[loopName],audioContext.currentTime);
+                }
+                if(startDetuneManifest[loopName]) {
+                    loopMusicNode.detune.setValueAtTime(startDetuneManifest[loopName],audioContext.currentTime);
+                }
+                loopMusicNode.buffer = loopBuffer;
+                loopMusicNode.loop = withLoop;
+    
+                if(loopSyncTime === null) {
+                    loopSyncTime = audioContext.currentTime;
+                }
+        
+                loopMusicNode.volumeControl = audioContext.createGain();
+                if(loopMuteManifest[loopName] && !loopMuteManifest[loopName].shouldPlay) {
+                    loopMusicNode.volumeControl.gain.setValueAtTime(0,audioContext.currentTime);
+                }
+                loopMusicNode.volumeControl.connect(musicOutputNode);
+                loopMusicNode.connect(loopMusicNode.volumeControl);
+    
+                const loopStartTime = audioContext.currentTime + audioContext.currentTime - loopSyncTime;
+                loopMusicNode.start(loopStartTime);
+                musicNodes[loopName] = loopMusicNode;
+                deleteTrack(introName);
             }
-            loopMusicNode.volumeControl.connect(musicOutputNode);
-            loopMusicNode.connect(loopMusicNode.volumeControl);
-
-            const loopStartTime = audioContext.currentTime + audioContext.currentTime - loopSyncTime;
-            loopMusicNode.start(loopStartTime);
-            musicNodes[loopName] = loopMusicNode;
-            deleteTrack(introName);
-        }
-
-        //This works so long as we can process everything within introBuffer.duration - which should never happen
-        if(audioContext.currentTime > startSyncTime) {
-            musicNode.start(audioContext.currentTime,audioContext.currentTime-startSyncTime);
+    
+            //This works so long as we can process everything within introBuffer.duration - which should never happen
+            if(audioContext.currentTime > startSyncTime) {
+                musicNode.start(audioContext.currentTime,audioContext.currentTime-startSyncTime);
+            } else {
+                musicNode.start(startSyncTime,0,musicNode.buffer.length);
+            }
+            musicNodes[introName] = musicNode;    
         } else {
-            musicNode.start(startSyncTime,0,musicNode.buffer.length);
+            console.warn(`Audio manager: '${introName}' and ${loopName} are missing from the audio buffers. Did we fail to load them?`);
         }
-        musicNodes[introName] = musicNode;
-
+    } else if(loopBuffer) {
+        console.warn(`Audio manager: '${introName}' is missing from audio buffers. Did we fail to load it?`);
+        playMusic(loopName,withLoop);
+    } else {
+        console.warn(`Audio manager: '${loopName}' is missing from audio buffers. Did we fail to load it?`);
+        console.warn("Audio manager: Cannot not start intro-loop without a loop.");
     }
 }
 
@@ -404,7 +407,7 @@ function stopSound(name) {
 function stopAllSounds() {
     Object.entries(activeSounds).forEach(stopSoundBucket);
 }
-function addBufferSource (fileName,callback,errorCallback) {
+function addBufferSource(fileName,callback,errorCallback) {
     let newName = fileName.split("/").pop();
     const newNameSplit = newName.split(".");
     newName = newNameSplit[newNameSplit.length-2];
