@@ -197,8 +197,8 @@ let activeLoops = {};
 function playMusicWithIntro(loopName,introName,withLoop=true) {
     const introBuffer = audioBuffers[introName];
     const loopBuffer = audioBuffers[loopName];
-    if(!introBuffer) {
-        if(loopBuffer) {
+    if(loopBuffer) {
+        if(introBuffer) {
             const musicNode = audioContext.createBufferSource();
             if(startSpeedManifest[introName]) {
                 musicNode.playbackRate.setValueAtTime(startSpeedManifest[introName],audioContext.currentTime);
@@ -262,14 +262,16 @@ function playMusicWithIntro(loopName,introName,withLoop=true) {
             }
             musicNodes[introName] = musicNode;    
         } else {
+            console.warn(`Audio manager: '${introName}' is missing from audio buffers. Did we fail to load it?`);
+            playMusic(loopName,withLoop);
+        }
+    } else {
+        if(introBuffer) {
+            console.warn(`Audio manager: '${loopName}' is missing from audio buffers. Did we fail to load it?`);
+            console.warn("Audio manager: Cannot not start intro-loop without a loop.");
+        } else {
             console.warn(`Audio manager: '${introName}' and ${loopName} are missing from the audio buffers. Did we fail to load them?`);
         }
-    } else if(loopBuffer) {
-        console.warn(`Audio manager: '${introName}' is missing from audio buffers. Did we fail to load it?`);
-        playMusic(loopName,withLoop);
-    } else {
-        console.warn(`Audio manager: '${loopName}' is missing from audio buffers. Did we fail to load it?`);
-        console.warn("Audio manager: Cannot not start intro-loop without a loop.");
     }
 }
 
