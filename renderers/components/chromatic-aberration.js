@@ -9,11 +9,15 @@ function GetDefaultOffsets() {
     }
 }
 function ChromaticAberration() {
-    let width, height;
+    let width = 0, height = 0;
 
     const resetDimensions = () => {
-        width = fullWidth;
-        height = fullHeight;
+        if(fullWidth !== undefined) {
+            width = fullWidth;
+        }
+        if(fullHeight !== undefined) {
+            height = fullHeight;
+        }
     }
     resetDimensions();
 
@@ -75,12 +79,10 @@ function ChromaticAberration() {
         offscreenContext.fillStyle = color;
         offscreenContext.fillRect(0,0,width,height);
     }
+    this.updateSize = () => refreshCanvas();
     this.render = () => {
         if(!enabled) {
             return;
-        }
-        if(width !== fullWidth || height !== fullHeight) {
-            refreshCanvases();
         }
 
         offscreenBufferContext.drawImage(

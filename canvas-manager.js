@@ -17,7 +17,7 @@ let widthByHeight = internalWidth / internalHeight;
 
 const backgroundCanvas = document.getElementById("background-canvas");
 const context = canvas.getContext("2d",{
-    alpha: false,
+    alpha: ENV_FLAGS.GLOBAL_CONTEXT_ALPHA ? true : false,
     desynchronized: false
 });
 const backgroundContext = backgroundCanvas.getContext("2d",{

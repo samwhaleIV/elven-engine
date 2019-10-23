@@ -1,15 +1,20 @@
-function CompositeProcessor() {
-    let width, height;
+function CompositeProcessor(alphaContext) {
+    alphaContext = alphaContext ? true : false;
+    let width = 0, height = 0;
     const resetDimensions = () => {
-        width = fullWidth;
-        height = fullHeight;
+        if(fullWidth !== undefined) {
+            width = fullWidth;
+        }
+        if(fullHeight !== undefined) {
+            height = fullHeight;
+        }
     }
     resetDimensions();
     const offscreenCanvas = new OffscreenCanvas(
         width,height
     );
     const offscreenContext = offscreenCanvas.getContext(
-        "2d",{alpha:false}
+        "2d",{alpha:alphaContext}
     );
     const refreshCanvas = () => {
         resetDimensions();
@@ -33,23 +38,27 @@ function CompositeProcessor() {
         xOffset = x;
         yOffset = y;
     }
+    this.updateSize = () => refreshCanvas();
+    this.composite = (buffer,xOffset,yOffset,mode) => {
+        context.save();
+        context.globalCompositeOperation = mode;
+        context.drawImage(
+            buffer,0,0,width,height,
+            xOffset,yOffset,width,height
+        );
+        context.restore();
+    }
     this.render = () => {
         if(!enabled) {
             return;
         }
-        if(width !== fullWidth || height !== fullHeight) {
-            refreshCanvas();
+        if(alphaContext) {
+            offscreenContext.clearRect(0,0,width,height);
         }
         offscreenContext.drawImage(
             canvas,0,0,width,height,0,0,width,height
         );
-        context.save();
-        context.globalCompositeOperation = mode;
-        context.drawImage(
-            offscreenCanvas,0,0,width,height,
-            xOffset,yOffset,width,height
-        );
-        context.restore();
+        this.composite(offscreenCanvas,xOffset,yOffset,mode);
     }
 }
 export default CompositeProcessor;
