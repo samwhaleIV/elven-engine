@@ -44,42 +44,36 @@ function GetImageSubstrateData(data) {
         hashCount: hashCount
     }
 }
-function GetImageSubstrate(data,withColorArray,withDefaultPalette) {
-    const substrateData = {};
-    if(withColorArray || withDefaultPalette) {
-        const imageSubstrateData = GetImageSubstrateData(data);
-        const hashCount = imageSubstrateData.hashCount;
-        const colorLookup = imageSubstrateData.colorLookup;
-        if(withColorArray) {
-            const colorArray = new Array(hashCount);
-            for(let index = 0;index<hashCount;index++) {
-                colorArray[index] = colorLookup[index];
-            }
-            substrateData.colorArray = colorArray;
-        }
-        if(withDefaultPalette) {
-            const palette = new Array(
-                hashCount
-            );
-            const dataView = new DataView(
-                imageData.data.buffer
-            );
-            for(let index = 0;index<hashCount;index++) {
-                const firstBucketEntryIndex = colorLookup[index][0];
-                palette[index] = `rgba(${
-                    dataView.getUint8(firstBucketEntryIndex)
-                },${
-                    dataView.getUint8(firstBucketEntryIndex+1)
-                },${
-                    dataView.getUint8(firstBucketEntryIndex+2)
-                },${
-                    dataView.getUint8(firstBucketEntryIndex+3) / 255
-                })`;
-            }
-            substrateData.defaultPalette = palette;
-        }
+function GetImageSubstrate(data) {
+    const imageSubstrateData = GetImageSubstrateData(data);
+    const hashCount = imageSubstrateData.hashCount;
+    const colorLookup = imageSubstrateData.colorLookup;
+    const colorArray = new Array(
+        hashCount
+    );
+    const palette = new Array(
+        hashCount
+    );
+    const dataView = new DataView(
+        imageData.data.buffer
+    );
+    for(let index = 0;index<hashCount;index++) {
+        colorArray[index] = colorLookup[index];
+        const firstBucketEntryIndex = colorLookup[index][0];
+        palette[index] = `rgba(${
+            dataView.getUint8(firstBucketEntryIndex)
+        },${
+            dataView.getUint8(firstBucketEntryIndex+1)
+        },${
+            dataView.getUint8(firstBucketEntryIndex+2)
+        },${
+            dataView.getUint8(firstBucketEntryIndex+3) / 255
+        })`;
     }
-    return substrateData;
+    return {
+        defaultPalette: palette,
+        colorArray: colorArray
+    };
 }
 function ParsePaletteColors(palette) {
     const paletteSize = palette.length;
@@ -140,7 +134,7 @@ function GetDefaultPalette(image) {
         0,0,imageWidth,imageHeight
     );
     return GetImageSubstrate(
-        imageData.data,false,true
+        imageData.data
     ).defaultPalette;
 }
 function ValidatePalette(palette,colorCount) {
@@ -161,7 +155,7 @@ function ValidatePalette(palette,colorCount) {
         key: palette
     }
 }
-function PaletteSwap(image,withDefaultPalette) {
+function PaletteSwap(image) {
     const imageWidth = image.width;
     const imageHeight = image.height;
     const testCanvas = new OffscreenCanvas(
@@ -178,7 +172,7 @@ function PaletteSwap(image,withDefaultPalette) {
         0,0,imageWidth,imageHeight
     );
     const substrateData = GetImageSubstrate(
-        imageData.data,true,withDefaultPalette ? true : false
+        imageData.data
     );
     const substrate = substrateData.colorArray;
     const colorCount = substrate.length;
@@ -191,27 +185,26 @@ function PaletteSwap(image,withDefaultPalette) {
         const validatedPalette = ValidatePalette(
             palette,colorCount
         );
-        swapCache[validatedPalette.hash] = image;
+        swapCache[validatedPalette.hash] = {
+            image: image,
+            shouldClose: false
+        };
     }
-    if(substrateData.defaultPalette) {
-        setDefaultPalette(
-            substrateData.defaultPalette
-        );
-    }
+    setDefaultPalette(
+        substrateData.defaultPalette
+    );
     this.getDefaultPalette = () => {
-        if(defaultPalette === null) {
-            setDefaultPalette(GetImageSubstrate(
-                imageData.data,false,true
-            ));
-        }
         return defaultPalette;
+    }
+    this.getPaletteSize = () => {
+        return colorCount;
     }
     this.getSwapped = palette => {
         palette = ValidatePalette(
             palette,colorCount
         );
         if(palette.hash in swapCache) {
-            return swapCache[palette.hash];
+            return swapCache[palette.hash].image;
         } else {
             const paletteColors = ParsePaletteColors(
                 palette.key
@@ -223,14 +216,17 @@ function PaletteSwap(image,withDefaultPalette) {
                 imageData,0,0
             );
             const bitmap = testCanvas.transferToImageBitmap();
-            swapCache[palette.hash] = bitmap;
+            swapCache[palette.hash] = {
+                image: bitmap,
+                shouldClose: true
+            };
             return bitmap;
         }
     }
     this.close = () => Object.entries(swapCache).forEach(entry => {
         const imageKey = entry[0];
         const image = entry[1];
-        if(typeof image.close === "function") {
+        if(image.shouldClose) {
             image.close();
         }
         delete swapCache[imageKey];
