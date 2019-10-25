@@ -21,15 +21,21 @@ function setFaderEffectsRenderer(renderer) {
     faderEffectsRenderer = renderer;
 }
 function setFaderDuration(time) {
+    let newTime = time;
     if(musicFadeOutDuration + musicFaderSafetyBuffer > time) {
-        faderTime = musicFadeOutDuration + musicFaderSafetyBuffer;
+        newTime = musicFadeOutDuration + musicFaderSafetyBuffer;
         console.warn(`Fader duration sould be greater by ${musicFaderSafetyBuffer}ms than the music fade out duration; Setting fader time to a safe value instead`);
-        return;
     }
-    faderTime = time;
+    faderTime = newTime;
+    if(rendererState && rendererState.fader) {
+        rendererState.fader.time = newTime;
+    }
 }
 function setFaderDelay(time) {
     faderDelay = time;
+    if(rendererState && rendererState.fader) {
+        rendererState.fader.fadeInDelay = time;
+    }
 }
 function setMusicFadeDuration(time) {
     if(time + musicFaderSafetyBuffer > faderTime) {
@@ -47,6 +53,7 @@ function getFader() {
         transitionParameters: null,
         transitionRenderer: null,
         inMethod: null,
+        didSetRendererState: null,
         fadeIn: exitMethod => {
             resumeRenderer();
             const now = performance.now();
@@ -97,6 +104,7 @@ function getFader() {
             rendererState.fader.start = performance.now();
             rendererState.fader.transitionRenderer = rendererGenerator;
             rendererState.fader.transitionParameters = parameters;
+            rendererState.fader
             const staticTime = rendererState.fader.time / 1000;
             if(faderOutSound) {
                 playSound(faderOutSound,staticTime);
@@ -131,7 +139,8 @@ function getFader() {
             const fadeInCompleter = () => {
                 fadeInDelay -= performance.now() - startTime;
                 if(fadeInDelay > 0) {
-                    setTimeout(fadeInCompleter,fadeInDelay,0);
+                    //Loopback, probably made correctly. But made weirdly. Why is it like this?
+                    setTimeout(fadeInCompleter,fadeInDelay);
                 } else {
                     setRendererState(rendererState);
                     rendererState.fader.fadeIn();
@@ -143,9 +152,13 @@ function getFader() {
             }
             if(rendererState.fader.transitionRenderer) {
                 drawLoadingText();
+                let rendererStateSetCallback = rendererState.fader.didSetRendererState;
                 rendererState = new rendererState.fader.transitionRenderer(
                     ...rendererState.fader.transitionParameters
                 );
+                if(rendererStateSetCallback) {
+                    rendererStateSetCallback();
+                }
                 if(!rendererState.fader) {
                     rendererState.fader = getFader();
                 }
@@ -177,6 +190,14 @@ function getFader() {
                         } else if(songLoaded) {
                             audioBufferAddedCallback = name => {
                                 if(name === rendererState.songIntro) {
+                                    if(rendererState.fancyEncodingData) {
+                                        generateIntroFromBuffer(
+                                            songName,fancyEncodingData.introName,
+                                            fancyEncodingData.loopLength,
+                                            fancyEncodingData.switchZoneLength
+                                        );
+                                        rendererState.songIntro = fancyEncodingData.introName;
+                                    }
                                     fadeInCompleter();
                                     audioBufferAddedCallback = null;
                                 }

@@ -409,6 +409,63 @@ function stopSound(name) {
 function stopAllSounds() {
     Object.entries(activeSounds).forEach(stopSoundBucket);
 }
+function generateIntroFromBuffer(bufferName,newIntroName,introLength,loopSwitchZoneLength) {
+    if(failedBuffers[newIntroName] || audioBuffers[newIntroName]) {
+        return true;
+    }
+    if(failedBuffers[bufferName]) {
+        return false;
+    }
+    const rootBuffer = audioBuffers[bufferName];
+    if(!rootBuffer) {
+        return false;
+    }
+    const totalLength = rootBuffer.length;
+    const channelCount = rootBuffer.numOfChannels;
+
+    const introDataLength = totalLength - loopSwitchZoneLength;
+    const loopDataLength = totalLength - introLength - loopSwitchZoneLength;
+
+    const introBuffer = new AudioBuffer({
+        numberOfChannels: rootBuffer.numOfChannels,
+        sampleRate: rootBuffer.sampleRate,
+        length: introDataLength
+    });
+    const loopBuffer = new AudioBuffer({
+        numberOfChannels: rootBuffer.numOfChannels,
+        sampleRate: rootBuffer.sampleRate,
+        length: loopDataLength
+    });
+
+    for(let channel = 0;channel<channelCount;channel++) {
+        const rootChannelData = rootBuffer.getChannelData(channel);
+
+        const introBufferData = new Float32Array(introDataLength);
+        const loopBufferData = new Float32Array(loopDataLength);
+
+        //Intro segment and first switch zone
+        introBufferData.set(
+            rootChannelData.slice(0,introLength+loopSwitchZoneLength),0
+        );
+
+        //First loop
+        introBufferData.set(
+            rootChannelData.slice(introLength+loopSwitchZoneLength*2,totalLength),introLength+loopSwitchZoneLength
+        );
+
+        //Second switch zone and loop
+        loopBufferData.set(
+            rootChannelData.slice(introLength+loopSwitchZoneLength,totalLength),0
+        );
+
+        introBuffer.copyToChannel(introBufferData,channel,0);
+        loopBuffer.copyToChannel(loopBufferData,channel,0);
+    }
+
+    audioBuffers[bufferName] = loopBuffer;
+    audioBuffers[newIntroName] = newIntroName;
+    return true;
+}
 function addBufferSource(fileName,callback,errorCallback) {
     let newName = fileName.split("/").pop();
     const newNameSplit = newName.split(".");
