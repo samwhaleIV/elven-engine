@@ -190,14 +190,6 @@ function getFader() {
                         } else if(songLoaded) {
                             audioBufferAddedCallback = name => {
                                 if(name === rendererState.songIntro) {
-                                    if(rendererState.fancyEncodingData) {
-                                        generateIntroFromBuffer(
-                                            songName,fancyEncodingData.introName,
-                                            fancyEncodingData.loopLength,
-                                            fancyEncodingData.switchZoneLength
-                                        );
-                                        rendererState.songIntro = fancyEncodingData.introName;
-                                    }
                                     fadeInCompleter();
                                     audioBufferAddedCallback = null;
                                 }
@@ -230,6 +222,15 @@ function getFader() {
                         } else {
                             audioBufferAddedCallback = name => {
                                 if(name === rendererState.song) {
+                                    const fancyEncodingData = rendererState.fancyEncodingData;
+                                    if(rendererState.fancyEncodingData) {
+                                        generateIntroFromBuffer(
+                                            name,fancyEncodingData.introName,
+                                            fancyEncodingData.introLength,
+                                            fancyEncodingData.switchZoneLength
+                                        );
+                                        rendererState.songIntro = fancyEncodingData.introName;
+                                    }
                                     fadeInCompleter();
                                     audioBufferAddedCallback = null;
                                 }

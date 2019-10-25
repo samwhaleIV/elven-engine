@@ -421,18 +421,18 @@ function generateIntroFromBuffer(bufferName,newIntroName,introLength,loopSwitchZ
         return false;
     }
     const totalLength = rootBuffer.length;
-    const channelCount = rootBuffer.numOfChannels;
+    const channelCount = rootBuffer.numberOfChannels;
 
     const introDataLength = totalLength - loopSwitchZoneLength;
     const loopDataLength = totalLength - introLength - loopSwitchZoneLength;
 
     const introBuffer = new AudioBuffer({
-        numberOfChannels: rootBuffer.numOfChannels,
+        numberOfChannels: channelCount,
         sampleRate: rootBuffer.sampleRate,
         length: introDataLength
     });
     const loopBuffer = new AudioBuffer({
-        numberOfChannels: rootBuffer.numOfChannels,
+        numberOfChannels: channelCount,
         sampleRate: rootBuffer.sampleRate,
         length: loopDataLength
     });
@@ -463,7 +463,7 @@ function generateIntroFromBuffer(bufferName,newIntroName,introLength,loopSwitchZ
     }
 
     audioBuffers[bufferName] = loopBuffer;
-    audioBuffers[newIntroName] = newIntroName;
+    audioBuffers[newIntroName] = introBuffer;
     return true;
 }
 function addBufferSource(fileName,callback,errorCallback) {
