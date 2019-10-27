@@ -35,7 +35,7 @@ function ChromaticAberration() {
         "2d",{alpha:false}
     );
 
-    const refreshCanvases = () => {
+    const refreshCanvas = () => {
         resetDimensions();
 
         offscreenCanvas.width = width;
