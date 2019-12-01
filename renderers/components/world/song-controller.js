@@ -1,3 +1,5 @@
+const OVERWORLD_MUSIC_FADE_TIME = 100;
+
 function WorldSongController() {
     this.stopMusic = callback => {
         fadeOutSongs(OVERWORLD_MUSIC_FADE_TIME,callback);

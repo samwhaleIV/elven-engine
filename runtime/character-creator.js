@@ -1,7 +1,7 @@
-const CharacterSpriteLookup = CharacterData.SpriteLookup;
-const CharacterDisplayNames = CharacterData.DisplayNames;
-const CharacterColors = CharacterData.Colors;
-const CharacterMakers = CharacterData.Makers;
+const CharacterSpriteLookup = GameCharacterData.SpriteLookup || {};
+const CharacterDisplayNames = GameCharacterData.DisplayNames || {};
+const CharacterColors = GameCharacterData.Colors || {};
+const CharacterMakers = GameCharacterData.Makers || {};
 
 const typeNameLookup = {
     "elf": ElfCharacterMaker,
