@@ -109,3 +109,8 @@ const IMAGE_TO_BITMAP_SETTINGS = {
 
 const MUSIC_FILE_FORMAT = ENV_FLAGS.MUSIC_FILE_FORMAT || "ogg";
 const ERROR_IMAGE = "error";
+const TRIGGER_ACTIVATED = Symbol("TRIGGER_ACTIVATED");
+
+function lerp(v0,v1,t) {
+    return v0*(1-t)+v1*t
+}

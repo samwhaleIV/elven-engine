@@ -20,18 +20,12 @@ import LetterUI from "./components/world/letter-ui.js";
 import ImagePreview from "./components/world/image-preview.js";
 
 const ALERT_TIME = 1000;
-const ANIMATION_TILE_COUNT = 5;
-const ANIMATION_CYCLE_DURATION = 400;
 const ANIMATION_FRAME_TIME = ANIMATION_CYCLE_DURATION / ANIMATION_TILE_COUNT;
-const POPUP_TIMEOUT = 150;
-const NEGATIVE_INFINITY_BUT_NOT_REALLY = -1000000;
-const SPECIAL_COLLISION_START = 28;
-const COLLISION_TRIGGER_OFFSET = -2;
-const IS_ZERO_FILTER = value => value === 0;
+const POPUP_TIMEOUT = 250;
+const WALK_AFTER_POPUP_DELAY = 120;
 
-const COLLISTION_TRIGGERS = {
-    3:true,4:true,5:true,6:true,7:true
-};
+const NEGATIVE_INFINITY_BUT_NOT_REALLY = -1000000;
+const IS_ZERO_FILTER = value => value === 0;
 
 const getDefaultCamera = () => {
     return {
@@ -170,7 +164,7 @@ function WorldRenderer() {
         if(this.map.unload) {
             this.map.unload(this);
         }
-        if(chapterState.unload) {
+        if(this.chapterState.unload) {
             chapterState.unload(this);
         }
         this.fader.fadeOut(...parameters);
@@ -250,7 +244,19 @@ function WorldRenderer() {
         customRendererStackIDLIFO.splice(0);
     }
     const playerInteractionLocked = () => {
-        return playerMovementLocked || escapeMenuShown || popupActive || this.prompt;
+        if(playerMovementLocked) {
+            return true;
+        }
+        if(escapeMenuShown) {
+            return true;
+        }
+        if(popupActive) {
+            return true;
+        }
+        if(this.prompt || this.popup) {
+            return true;
+        }
+        return performance.now() < lastPopupCleared + WALK_AFTER_POPUP_DELAY;
     }
     this.playerInteractionLocked = playerInteractionLocked;
     this.lockPlayerMovement = function() {
@@ -414,8 +420,9 @@ function WorldRenderer() {
         }
         const page = pages;
         return new Promise(async resolve => {
-            if(performance.now() < lastPopupCleared + POPUP_TIMEOUT) {
-                await delay(POPUP_TIMEOUT);
+            const now = performance.now();
+            if(now < lastPopupCleared + POPUP_TIMEOUT) {
+                await delay(POPUP_TIMEOUT - (now - lastPopupCleared));
             }
             this.popup = new WorldPopup(
                 [page],
@@ -443,6 +450,7 @@ function WorldRenderer() {
     }
     this.clearPrompt = () => {
         this.prompt = null;
+        lastPopupCleared = performance.now();
     }
     this.showPrompt = (question,...options) => {
         return new Promise(resolve => {
@@ -458,6 +466,7 @@ function WorldRenderer() {
             this.popup = new LetterUI(message,()=>{
                 popupActive = false;
                 this.popup = null;
+                lastPopupCleared = performance.now();
                 resolve();
             });
         });
