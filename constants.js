@@ -108,3 +108,4 @@ const IMAGE_TO_BITMAP_SETTINGS = {
 };
 
 const MUSIC_FILE_FORMAT = ENV_FLAGS.MUSIC_FILE_FORMAT || "ogg";
+const ERROR_IMAGE = "error";
