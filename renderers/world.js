@@ -40,6 +40,7 @@ function WorldRenderer() {
     this.ImagePreview = ImagePreview;
     this.allowKeysDuringPause = true;
     this.disableAdaptiveFill = true;
+    this.escapeMenu = null;
     this.noPixelScale = true;
     let tileset = null;
     let alert = null;
