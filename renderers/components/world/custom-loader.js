@@ -1,5 +1,3 @@
-import GlobalState from "../../../runtime/global-state.js";
-
 function CustomWorldLoader() {
     let ranCustomLoader = false;
     Object.defineProperty(this,"ranCustomLoader",{
@@ -8,48 +6,7 @@ function CustomWorldLoader() {
         }
     });
     this.loadLastMapOrDefault = () => {
-        let lastMap, lp, debugPosition;
-        if(ENV_FLAGS.DEBUG_MAP) {
-            if(typeof ENV_FLAGS.DEBUG_MAP === "string") {
-                lastMap = ENV_FLAGS.DEBUG_MAP;
-                if(GlobalState.data["last_map"] !== lastMap) {
-                    debugPosition = true;
-                }
-            } else {
-                lastMap = ENV_FLAGS.DEBUG_MAP.name;
-                if(ENV_FLAGS.DEBUG_MAP.position) {
-                    lp = ENV_FLAGS.DEBUG_MAP.position;
-                    if(isNaN(lp.x)) lp.x = 0;
-                    if(isNaN(lp.y)) lp.y = 0;
-                    if(!lp.d) lp.d = "down";
-                    debugPosition = true;
-                }
-            }
-        } else {
-            lastMap = GlobalState.data["last_map"]; 
-        }
-        if(lastMap) {
-            this.updateMap(lastMap);
-            if(!debugPosition) {
-                lp = GlobalState.data["last_player_pos"];
-            }
-            if(lp) {
-                return () => {
-                    if(this.internalPlayerObject && !this.internalPlayerObject.forcedStartPosition) {
-                        this.moveObject(this.internalPlayerObject.ID,lp.x,lp.y,true);
-                        this.internalPlayerObject.updateDirection(lp.d);
-                    }
-                }
-            }
-        } else {
-            let startMap = this.chapter.startMap ? this.chapter.startMap : null;
-            if(!startMap) {
-                startMap = FALLBACK_MAP_ID;
-                console.warn(`World: Using a fallback map because chapter ${this.activeChapter} is missing a start map start map`);
-            }
-            this.updateMap(startMap);
-        }
-        return null;
+        throw Error("World: Load last map or default does not have an implementation!");
     }
     this.updateMapEnd = function() {
         this.pendingPlayerObject = null;
@@ -63,8 +20,8 @@ function CustomWorldLoader() {
             this.playerObject = this.pendingPlayerObject;
         }
         this.pendingPlayerObject = null;
-        if(this.chapterState.mapChanged) {
-            this.chapterState.mapChanged(this.map);
+        if(this.mapChanged) {
+            this.mapChanged();
         }
         this.restoreRoomSong();
     }
@@ -91,8 +48,8 @@ function CustomWorldLoader() {
             const endTime = performance.now();
             const realTimeSpentLoading = endTime - startTime;
             const firstTime = !ranCustomLoader;
-            if(!fromMapUpdate && this.chapterState.load) {
-                this.chapterState.load(this);
+            if(!fromMapUpdate && this.firstTimeLoad) {
+                this.firstTimeLoad();
             }
             this.updateMapEnd();
             if(!fromMapUpdate) {
