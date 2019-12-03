@@ -811,13 +811,19 @@ function WorldRenderer() {
             this.renderMap.lighting = newMap.baseData.lighting.slice(0);
             lightingLayerActive = true;
         }
+        let defaultBackgroundColor;
+        if(this.defaultBackgroundColor) {
+            defaultBackgroundColor = this.defaultBackgroundColor;
+        } else {
+            defaultBackgroundColor = DEFAULT_BACKGROUND_COLOR;
+        }
         if(newMap.fxBackground) {
             backgroundRenderer = new newMap.fxBackground(this,data);
         } else if(newMap.backgroundColor) {
             backgroundColor = newMap.backgroundColor;
             backgroundRenderer = null;
         } else {
-            backgroundColor = DEFAULT_BACKGROUND_COLOR;
+            backgroundColor = defaultBackgroundColor;
             backgroundRenderer = null;
         }
         this.objectsLookup = [];
