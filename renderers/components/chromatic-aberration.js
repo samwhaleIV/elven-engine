@@ -1,6 +1,6 @@
-const red = "rgb(255,0,0)";
+const red =   "rgb(255,0,0)";
 const green = "rgb(0,255,0)";
-const blue = "rgb(0,0,255)";
+const blue =  "rgb(0,0,255)";
 
 function GetDefaultOffsets() {
     return {
@@ -58,10 +58,13 @@ function ChromaticAberration() {
 
     this.setOffsets = (channel,x,y) => {
         switch(channel) {
+            case "r":
             case "red":
                 channel = redOffsets; break;
+            case "g":
             case "green":
                 channel = greenOffsets; break;
+            case "b":
             case "blue":
                 channel = blueOffsets; break;
             default:

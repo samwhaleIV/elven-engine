@@ -23,6 +23,7 @@ const ALERT_TIME = 1000;
 const ANIMATION_FRAME_TIME = ANIMATION_CYCLE_DURATION / ANIMATION_TILE_COUNT;
 const POPUP_TIMEOUT = 250;
 const WALK_AFTER_POPUP_DELAY = 120;
+const DEFAULT_BACKGROUND_COLOR = "black";
 
 const NEGATIVE_INFINITY_BUT_NOT_REALLY = -1000000;
 const IS_ZERO_FILTER = value => value === 0;
@@ -81,6 +82,8 @@ function WorldRenderer() {
     this.followObject = null;
     this.postProcessor = new PostProcessor(0.25);
     this.compositeProcessor = null;
+
+    let backgroundColor = DEFAULT_BACKGROUND_COLOR;
 
     CustomWorldLoader.apply(this);
     WorldSongController.apply(this);
@@ -801,16 +804,20 @@ function WorldRenderer() {
         }
         lightingLayerActive = false;
         this.renderMap = newMap;
-        this.renderMap.background = newMap.baseData.background.slice();
-        this.renderMap.foreground = newMap.baseData.foreground.slice();
-        this.renderMap.collision = newMap.baseData.collision.slice();
+        this.renderMap.background = newMap.baseData.background.slice(0);
+        this.renderMap.foreground = newMap.baseData.foreground.slice(0);
+        this.renderMap.collision = newMap.baseData.collision.slice(0);
         if(newMap.baseData.lighting) {
-            this.renderMap.lighting = newMap.baseData.lighting.slice();
+            this.renderMap.lighting = newMap.baseData.lighting.slice(0);
             lightingLayerActive = true;
         }
         if(newMap.fxBackground) {
             backgroundRenderer = new newMap.fxBackground(this,data);
+        } else if(newMap.backgroundColor) {
+            backgroundColor = newMap.backgroundColor;
+            backgroundRenderer = null;
         } else {
+            backgroundColor = DEFAULT_BACKGROUND_COLOR;
             backgroundRenderer = null;
         }
         this.objectsLookup = [];
@@ -869,7 +876,13 @@ function WorldRenderer() {
         if(this.compositeProcessor) {
             this.compositeProcessor.updateSize();
         }
-        let adjustedTileSize = WorldTileSize * this.renderMap.renderScale;
+        let renderScale = 1;
+        if(this.forcedRenderScale) {
+            renderScale = this.forcedRenderScale;
+        } else if(this.renderMap.renderScale) {
+            renderScale = this.renderMap.renderScale;
+        }
+        let adjustedTileSize = WorldTileSize * renderScale;
         if(fullWidth < smallScaleSnapPoint) {
             adjustedTileSize *= 1.5;
         } else if(fullWidth < mediumScaleSnapPoint) {
@@ -1043,7 +1056,7 @@ function WorldRenderer() {
             if(backgroundRenderer) {
                 backgroundRenderer.render(timestamp);
             } else {
-                context.fillStyle = "black";
+                context.fillStyle = backgroundColor;
                 context.fillRect(0,0,fullWidth,fullHeight);
             }
 
@@ -1196,7 +1209,7 @@ function WorldRenderer() {
             if(backgroundRenderer) {
                 backgroundRenderer.render(timestamp);
             } else {
-                context.fillStyle = "black";
+                context.fillStyle = backgroundColor;
                 context.fillRect(0,0,fullWidth,fullHeight);
             }
         }
