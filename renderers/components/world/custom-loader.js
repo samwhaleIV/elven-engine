@@ -8,7 +8,7 @@ function CustomWorldLoader() {
         }
     });
     this.loadLastMapOrDefault = () => {
-        throw Error("World: Load last map or default does not have an implementation!");
+        throw Error("World: loadLastMapOrDefault or default does not have an implementation!");
     }
     this.updateMapEnd = function() {
         this.pendingPlayerObject = null;
@@ -56,7 +56,7 @@ function CustomWorldLoader() {
             this.updateMapEnd();
             if(!fromMapUpdate) {
                 if(loadPlayer) {
-                    loadPlayer();
+                    loadPlayer(this.internalPlayerObject);
                 }
                 ranCustomLoader = true;
             }

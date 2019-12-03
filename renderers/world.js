@@ -165,8 +165,8 @@ function WorldRenderer() {
         if(this.map.unload) {
             this.map.unload(this);
         }
-        if(this.chapterState.unload) {
-            chapterState.unload(this);
+        if(this.unload) {
+            this.unload();
         }
         this.fader.fadeOut(...parameters);
     }
@@ -184,11 +184,15 @@ function WorldRenderer() {
         }
     };
     this.restoreState = (ignorePositionData=false) => {
+        console.warn("This method has not gone through extensive testing. It may be wiser to reload the world renderer state.");
         GlobalState.restore();
         if(ignorePositionData) {
             return;
         }
-        this.loadLastMapOrDefault();
+        const loadPlayer = this.loadLastMapOrDefault();
+        if(loadPlayer) {
+            loadPlayer(this.internalPlayerObject);
+        }
     }
     this.formatStringWithCharacter = (character,customString) => {
         const message = customString.replace("{NAME}",character.coloredName);
