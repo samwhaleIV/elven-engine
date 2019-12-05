@@ -114,3 +114,18 @@ const TRIGGER_ACTIVATED = Symbol("TRIGGER_ACTIVATED");
 function lerp(v0,v1,t) {
     return v0*(1-t)+v1*t
 }
+
+const invertDirection = direction => {
+    switch(direction) {
+        case "up":
+            return "down";
+        case "down":
+            return "up";
+        case "left":
+            return "right";
+        case "right":
+            return "left";
+        default:
+            return direction;
+    }
+}
