@@ -114,7 +114,6 @@ const TRIGGER_ACTIVATED = Symbol("TRIGGER_ACTIVATED");
 function lerp(v0,v1,t) {
     return v0*(1-t)+v1*t
 }
-
 const invertDirection = direction => {
     switch(direction) {
         case "up":
@@ -128,4 +127,10 @@ const invertDirection = direction => {
         default:
             return direction;
     }
+}
+function delay(time,...parameters) {
+    return new Promise(resolve=>setTimeout(resolve,time,...parameters));
+}
+function getRandomPolarity() {
+    return Math.round(Math.random()) * 2 - 1;
 }

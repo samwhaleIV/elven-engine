@@ -726,3 +726,10 @@ function forceRender() {
     window.cancelAnimationFrame(animationFrame);
     render(performance.now());
 }
+function debugOffscreenCanvas(canvas) {
+    canvas.convertToBlob({
+        type: "image/png"
+    }).then(function(blob) {
+        window.open(URL.createObjectURL(blob));
+    });
+}
