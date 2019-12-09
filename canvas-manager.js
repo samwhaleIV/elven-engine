@@ -592,7 +592,7 @@ const renderGamepads = function() {
 }
 const render = (function(){
     const evaluatedRenderMethod = Function("timestamp",
-        `animationFrame = window.requestAnimationFrame(render);
+        `"use strict";animationFrame = window.requestAnimationFrame(render);
         ${!ENV_FLAGS.STATIC_BACKGROUND?"backgroundContext.fillRect(0,0,1,1);":""}
         if(!paused) {
             canvas.width = fullWidth;
