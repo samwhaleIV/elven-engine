@@ -783,6 +783,9 @@ function WorldRenderer() {
                 this.map.scriptTerminator(this);
             }
         }
+        if(!newMap) {
+            throw Error(`Map '${newMapName}' does not exist in worldMaps`);
+        }
         this.decals = [];
         this.objects = {};
         offscreenObjects = [];
@@ -865,6 +868,9 @@ function WorldRenderer() {
             }
         });
     }
+    this.getTilesetImage = () => {
+        return tileset;
+    }
     this.setTilesetImage = name => {
         currentTileSetName = name;
         tileset = imageDictionary[name];
@@ -875,12 +881,6 @@ function WorldRenderer() {
     this.updateSize = function() {
         if(!didStartRenderer) {
             return;
-        }
-        if(backgroundRenderer && backgroundRenderer.updateSize) {
-            backgroundRenderer.updateSize();
-        }
-        if(this.compositeProcessor) {
-            this.compositeProcessor.updateSize();
         }
         let renderScale = 1;
         if(this.forcedRenderScale) {
@@ -927,6 +927,18 @@ function WorldRenderer() {
                 }
                 this.fixedCameraOverride = false;
             }
+        }
+
+        if(backgroundRenderer && backgroundRenderer.updateSize) {
+            const updateSizeParameters = [
+                tileSize,
+                horizontalTiles,verticalTiles,
+                horizontalOffset,verticalOffset
+            ];
+            backgroundRenderer.updateSize(...updateSizeParameters);
+        }
+        if(this.compositeProcessor) {
+            this.compositeProcessor.updateSize();
         }
 
         if(lightingLayerActive || this.renderMap.usesLightSprites) {

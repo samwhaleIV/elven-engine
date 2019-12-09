@@ -396,6 +396,8 @@ function PlayerController(world) {
                 if(!worldHasPlayer) return;
                 processEnter();
                 return;
+            default:
+                return;
         }
         applyPlayerVelocities();
         if(movementDown() && !loopRunning) {

@@ -376,8 +376,6 @@ function createRainbowGradient() {
 }
 
 function setSizeConstants() {
-    fullWidth = canvas.width;
-    fullHeight = canvas.height;
     halfWidth = fullWidth / 2;
     halfHeight = fullHeight / 2;
     doubleWidth = fullWidth * 2;
@@ -423,8 +421,8 @@ function applySizeMode(forced=false) {
         return;
     }
     if(rendererState.forcedSizeMode === sizeModes.classic.name) {
-        canvas.width = internalWidth;
-        canvas.height = internalHeight;
+        fullWidth = internalWidth;
+        fullHeight = internalHeight;
         switch(canvasSizeMode) {
             default:
             case "fit":
@@ -449,9 +447,9 @@ function applySizeMode(forced=false) {
                 canvas.style.top = "0";
                 break;
             case "center":
-                canvas.style.width = canvas.width + "px";
-                canvas.style.height = canvas.height + "px";
-                canvas.style.left = ((window.innerWidth / 2) - (canvas.width / 2)) + "px";
+                canvas.style.width = fullWidth + "px";
+                canvas.style.height = fullHeight + "px";
+                canvas.style.left = ((window.innerWidth / 2) - (fullWidth / 2)) + "px";
                 canvas.style.top = "4vh";
                 break;
         }
@@ -479,8 +477,8 @@ function applySizeMode(forced=false) {
         switch(sizeMode) {
             case sizeModes.fit.name:
                 applyLowResolutionTextAdaptions();
-                canvas.width = internalWidth;
-                canvas.height = internalHeight;
+                fullWidth = internalWidth;
+                fullHeight = internalHeight;
                 if(window.innerWidth / window.innerHeight > widthByHeight) {
                     const newWidth = window.innerHeight * widthByHeight;
     
@@ -526,8 +524,8 @@ function applySizeMode(forced=false) {
                     applyHighResolutionTextAdaptions();
                 }
     
-                canvas.width = (window.innerWidth/zoomDivider)
-                canvas.height = (window.innerHeight/zoomDivider);
+                fullWidth = (window.innerWidth/zoomDivider)
+                fullHeight = (window.innerHeight/zoomDivider);
     
                 canvas.style.width = window.innerWidth + "px";
                 canvas.style.height = window.innerHeight + "px";
@@ -536,11 +534,13 @@ function applySizeMode(forced=false) {
                 break;
             case sizeModes.center.name:
                 applyLowResolutionTextAdaptions();
-                canvas.width = internalWidth;
-                canvas.height = internalHeight;
-                canvas.style.width = canvas.width + "px";
-                canvas.style.height = canvas.height + "px";
-                canvas.style.left = ((window.innerWidth / 2) - (canvas.width / 2)) + "px";
+
+                fullWidth = internalWidth;
+                fullHeight = internalHeight;
+
+                canvas.style.width = fullWidth + "px";
+                canvas.style.height = fullHeight + "px";
+                canvas.style.left = ((window.innerWidth / 2) - (fullWidth / 2)) + "px";
                 canvas.style.top = "4vh";
                 break;
         }
@@ -550,7 +550,6 @@ function applySizeMode(forced=false) {
     if(rendererState.updateSize) {
         rendererState.updateSize();
     }
-    context.imageSmoothingEnabled = false;
 }
 function cycleSizeMode() {
     let newMode = defaultSizeMode;
@@ -580,64 +579,30 @@ function cycleSizeMode() {
     localStorage.setItem(SIZE_MODE_KEY,newMode);
     console.log(`Canvas handler: Set size mode to '${newMode}'`);
 }
-const render = (function(){
-    if(ENV_FLAGS.STATIC_BACKGROUND) {
-        if(ENV_FLAGS.CONTROLLER_DISABLED) {
-            return function render(timestamp) {
-                animationFrame = window.requestAnimationFrame(render); 
-                if(!paused) {
-                    rendererState.render(timestamp);
-                    rendererState.fader.render(timestamp);
-                }
-            }
-        } else {
-            return function render(timestamp) {
-                animationFrame = window.requestAnimationFrame(render);
-                if(!paused) {
-                    rendererState.render(timestamp);
-                    rendererState.fader.render(timestamp);
-                    const gamepads = navigator.getGamepads();
-                    let i = 0;
-                    while(i < gamepads.length) {
-                        if(gamepads[i] && gamepads[i].mapping === "standard") {
-                            processGamepad(gamepads[i],timestamp);
-                            i = gamepads.length;
-                        }
-                        i++;
-                    }
-                }
-            }
+const renderGamepads = function() {
+    const gamepads = navigator.getGamepads();
+    let i = 0;
+    while(i < gamepads.length) {
+        if(gamepads[i] && gamepads[i].mapping === "standard") {
+            processGamepad(gamepads[i],timestamp);
+            i = gamepads.length;
         }
-    } else {
-        if(ENV_FLAGS.CONTROLLER_DISABLED) {
-            return function render(timestamp) {
-                animationFrame = window.requestAnimationFrame(render); 
-                backgroundContext.fillRect(0,0,1,1);
-                if(!paused) {
-                    rendererState.render(timestamp);
-                    rendererState.fader.render(timestamp);
-                }
-            }
-        } else {
-            return function render(timestamp) {
-                animationFrame = window.requestAnimationFrame(render); 
-                backgroundContext.fillRect(0,0,1,1);
-                if(!paused) {
-                    rendererState.render(timestamp);
-                    rendererState.fader.render(timestamp);
-                    const gamepads = navigator.getGamepads();
-                    let i = 0;
-                    while(i < gamepads.length) {
-                        if(gamepads[i] && gamepads[i].mapping === "standard") {
-                            processGamepad(gamepads[i],timestamp);
-                            i = gamepads.length;
-                        }
-                        i++;
-                    }
-                }
-            }
-        }
+        i++;
     }
+}
+const render = (function(){
+    const evaluatedRenderMethod = Function("timestamp",
+        `animationFrame = window.requestAnimationFrame(render);
+        ${!ENV_FLAGS.STATIC_BACKGROUND?"backgroundContext.fillRect(0,0,1,1);":""}
+        if(!paused) {
+            canvas.width = fullWidth;
+            canvas.height = fullHeight;
+            context.imageSmoothingEnabled = false;
+            rendererState.render(timestamp);
+            rendererState.fader.render(timestamp);
+            ${!ENV_FLAGS.CONTROLLER_DISABLED?"renderGamepads":""}
+        }`);
+    return evaluatedRenderMethod;
 })();
 function stopRenderer() {
     console.warn("Warning: Stopping the renderer is deprecated for typical use cases. Use pause and resume methods instead");
