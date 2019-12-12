@@ -41,8 +41,6 @@ function DragTestRenderer() {
     }
 
     this.render = () => {
-        context.fillStyle = "black";
-        context.fillRect(0,0,fullWidth,fullHeight);
         drawColoredRectangle(box);
     }
 }

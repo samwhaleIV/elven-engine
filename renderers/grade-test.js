@@ -13,8 +13,6 @@ function GradeTestRenderer() {
     })();
 
     this.render = () => {
-        context.fillStyle = "black";
-        context.fillRect(0,0,fullWidth,fullHeight);
         if(image === null) {
             return;
         }

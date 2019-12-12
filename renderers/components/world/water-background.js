@@ -12,10 +12,16 @@ function WaterBackground(
 
     const offscreenCanvas = new OffscreenCanvas(0,0);
     const offscreenContext = offscreenCanvas.getContext("2d");
-    offscreenContext.imageSmoothingEnabled = false; 
+    offscreenContext.imageSmoothingEnabled = false;
     const tileset = world.getTilesetImage();
 
-    this.updateSize = newSize => {
+    let xOffset = 0;
+    let yOffset = 0;
+
+    this.updateSize = (newSize,...parameters) => {
+        xOffset = parameters[2];
+        yOffset = parameters[3];
+
         size = newSize;
 
         offscreenCanvas.width = newSize;
@@ -45,8 +51,8 @@ function WaterBackground(
         context.save();
         context.rect(0,0,fullWidth,fullHeight);
         context.translate(
-            -xOffsetDistance*size,
-            -yOffsetDistance*size
+            -xOffsetDistance*size + xOffset,
+            -yOffsetDistance*size + yOffset
         );
         context.fill();
         context.restore();
@@ -55,8 +61,8 @@ function WaterBackground(
         context.save();
         context.rect(0,0,fullWidth,fullHeight);
         context.translate(
-            (offset - cameraXDistance) * size,
-            -cameraYDistance * size
+            (offset - cameraXDistance) * size + xOffset,
+            -cameraYDistance * size + yOffset
         );
         context.globalCompositeOperation = "lighter";
         context.scale(-1,-1);
