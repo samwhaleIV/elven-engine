@@ -256,13 +256,8 @@ function PlayerController(world) {
                             world.collides(collisionX,player.y+polarity,player.ID) ||
                             world.collides(collisionX,player.y,player.ID);
                         if(!collisionTest) {
-                            let resolveDifference;
-                            if(ab > 0.5) {
-                                resolveDifference = 1 - ab;
-                            } else {
-                                resolveDifference = ab;
-                            }
-                            world.cameraResolveX += player.xOffset > 0 ? resolveDifference : -resolveDifference;
+                            const change = collisionX - (player.x + player.xOffset);
+                            world.cameraResolveX -= change;
                             player.xOffset = 0;
                             world.moveObject(player.ID,collisionX,player.y);
                         }
@@ -280,13 +275,8 @@ function PlayerController(world) {
                             world.collides(player.x+polarity,collisionY,player.ID) ||
                             world.collides(player.x,collisionY,player.ID);
                         if(!collisionTest) {
-                            let resolveDifference;
-                            if(ab > 0.5) {
-                                resolveDifference = 1 - ab;
-                            } else {
-                                resolveDifference = ab;
-                            }
-                            world.cameraResolveY += player.yOffset > 0 ? resolveDifference : -resolveDifference;
+                            const change = collisionY - (player.y + player.yOffset);
+                            world.cameraResolveY -= change;
                             player.yOffset = 0;
                             world.moveObject(player.ID,player.x,collisionY);
                         }
