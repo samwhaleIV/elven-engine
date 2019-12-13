@@ -25,6 +25,8 @@ const POPUP_TIMEOUT = 250;
 const WALK_AFTER_POPUP_DELAY = 150;
 const DEFAULT_BACKGROUND_COLOR = "black";
 
+const CAMERA_RESOLVE_RATE = 5000;
+
 const NEGATIVE_INFINITY_BUT_NOT_REALLY = -1000000;
 const IS_ZERO_FILTER = value => value === 0;
 
@@ -63,6 +65,7 @@ function WorldRenderer() {
     this.prompt = null;
     let lightingLayerActive = false;
     let playerMovementLocked = false;
+    let lastCameraResolve = null;
 
     let escapeMenuShown = false;
     this.escapeMenuDisabled = false;
@@ -82,6 +85,9 @@ function WorldRenderer() {
     this.followObject = null;
     this.postProcessor = new PostProcessor(0.25);
     this.compositeProcessor = null;
+
+    this.cameraResolveX = 0;
+    this.cameraResolveY = 0;
 
     let backgroundColor = DEFAULT_BACKGROUND_COLOR;
 
@@ -794,6 +800,8 @@ function WorldRenderer() {
         this.followObject = null;
         cameraXFollowEnabled = true;
         cameraYFollowEnabled = true;
+        this.cameraResolveX = 0;
+        this.cameraResolveY = 0;
         this.cameraFrozen = false;
         this.compositeProcessor = null;
         tileRenderingEnabled = true;
@@ -1007,6 +1015,42 @@ function WorldRenderer() {
     this.disableCameraYFollow = () => {
         cameraYFollowEnabled = false;
     }
+
+    const processCameraResolve = timestamp => {
+        if(this.cameraResolveX || this.cameraResolveY) {
+            if(lastCameraResolve === null) {
+                lastCameraResolve = timestamp;
+            }
+            const resolveDelta = (timestamp - lastCameraResolve) / CAMERA_RESOLVE_RATE;
+            lastCameraResolve = timestamp;
+            if(this.cameraResolveX < 0) {
+                this.cameraResolveX += resolveDelta;
+                if(this.cameraResolveX > 0) {
+                    this.cameraResolveX = 0;
+                }
+            } else {
+                this.cameraResolveX -= resolveDelta;
+                if(this.cameraResolveX < 0) {
+                    this.cameraResolveX = 0;
+                }
+            }
+            if(this.cameraResolveY < 0) {
+                this.cameraResolveY += resolveDelta;
+                if(this.cameraResolveY > 0) {
+                    this.cameraResolveY = 0;
+                }
+            } else {
+                this.cameraResolveY -= resolveDelta;
+                if(this.cameraResolveY < 0) {
+                    this.cameraResolveY = 0;
+                }
+            }
+            this.camera.xOffset += this.cameraResolveX;
+            this.camera.yOffset += this.cameraResolveY;
+        } else {
+            lastCameraResolve = null;
+        }
+    }
     this.updateCamera = function(timestamp,movementLocked) {
         if(this.cameraController) {
             this.cameraController(timestamp);
@@ -1035,6 +1079,7 @@ function WorldRenderer() {
                 }
             }
         }
+        processCameraResolve(timestamp);
         if(this.renderMap.useCameraPadding) {
             const abolsuteCameraX = this.camera.x + this.camera.xOffset;
             const absoluteCameraY = this.camera.y + this.camera.yOffset;

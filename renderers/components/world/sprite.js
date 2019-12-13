@@ -289,25 +289,27 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         let upOffsetValue = this.world.getCollisionTile(this.x,lerpYStart);
         let downOffsetValue = this.world.getCollisionTile(this.x,lerpYEnd);
 
+        const adjustedStairHeight = STAIR_HEIGHT - this.renderYOffset;
+
         if(leftOffsetValue !== ELEVATION_TILE) {
             leftOffsetValue = 0;
         } else {
-            leftOffsetValue = -STAIR_HEIGHT;
+            leftOffsetValue = -adjustedStairHeight;
         }
         if(rightOffsetValue !== ELEVATION_TILE) {
             rightOffsetValue = 0;
         } else {
-            rightOffsetValue = -STAIR_HEIGHT;
+            rightOffsetValue = -adjustedStairHeight;
         }
         if(upOffsetValue !== ELEVATION_TILE) {
             upOffsetValue = 0;
         } else {
-            upOffsetValue = -STAIR_HEIGHT;
+            upOffsetValue = -adjustedStairHeight;
         }
         if(downOffsetValue !== ELEVATION_TILE) {
             downOffsetValue = 0;
         } else {
-            downOffsetValue = -STAIR_HEIGHT;
+            downOffsetValue = -adjustedStairHeight;
         }
         let offset = 0;
 
@@ -484,6 +486,9 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
 
     this.overlay = new MultiLayer();
 
+    this.renderXOffset = 0;
+    this.renderYOffset = 0;
+
     const processRenderLogicForFrame = timestamp => {
         if(this.skipRenderLogic) {
             this.skipRenderLogic = false;
@@ -498,10 +503,10 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             let renderWidth = width * worldScaleTranslation;
             let renderHeight = customWidthRatio * renderWidth;
 
-            const renderXOffset = (width - renderWidth) / 2;
-            const renderYOffset = height - renderHeight;
+            const renderXOffset = (width - renderWidth) / 2 - Math.floor(renderWidth * this.renderXOffset);
+            const renderYOffset = height - renderHeight - Math.floor(renderHeight * this.renderYOffset);
 
-            const destinationX = (this.xOffset * width + x + (this.x - startX) * width) + renderXOffset
+            const destinationX = (this.xOffset * width + x + (this.x - startX) * width) + renderXOffset;
             const destinationY = (this.yOffset * height + y + (this.y - startY) * height) + renderYOffset;
 
             const animationRow = specialRow !== null ? specialRow : !this.walkingOverride && walking ? 
@@ -526,8 +531,10 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         }
     } else {
         this.renderSelf = function(x,y,width,height) {
-            const destinationX = this.xOffset * width + x + (this.x - startX) * width;
-            const destinationY = this.yOffset * height + y + (this.y - startY) * height;
+            const renderXOffset = Math.floor(width * this.renderXOffset);
+            const renderYOffset = Math.floor(height * this.renderYOffset);
+            const destinationX = this.xOffset * width + x + (this.x - startX) * width - renderXOffset;
+            const destinationY = this.yOffset * height + y + (this.y - startY) * height - renderYOffset;
             const animationRow = specialRow !== null ? specialRow : !this.walkingOverride && walking ? 
                 Math.floor(recentTimestamp / this.animationFrameTime) % rowCount * rowHeight
             : 0;
