@@ -24,6 +24,8 @@ const mediumResolutionAdaptiveTextSpacing = 4;
 const lowResolutionAdaptiveTextScale = 2;
 const lowResolutionAdpativeTextSpacing = 1;
 
+const FAKE_OVERWORLD_LOAD_TIME = 500;
+
 const kc = {
     accept: "k_accept",
     cancel: "k_cancel",

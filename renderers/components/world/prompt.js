@@ -50,37 +50,25 @@ function WorldPrompt(text,selections,callback) {
         SelectionChangeSound();
     }
 
-    const largeTextScale = 4;
-    const smallTextScale = 3;
-
     this.startY = 0;
+
+    const textScale = 4;
 
     this.render = function() {
         if(terminated) {
             return;
         }
 
-        const textScale = fullWidth > 600 ? largeTextScale : smallTextScale;
-
-        const popupWidth = halfWidth > 700 ? halfWidth : fullWidth < 700 ? fullWidth - 20 : 700 - 20;
-        const popupHeight = fullHeight < 290 ? fullHeight - 20 : 270;
+        const popupWidth = Math.min(800,fullWidth-20);
+        const popupHeight = Math.min(300,fullHeight-20);
 
         const popupY = fullHeight - 10 - popupHeight;
+        const popupX = Math.round(halfWidth - popupWidth / 2);
         this.startY = popupY;
-        const popupX = Math.round(
-            halfWidth - popupWidth / 2
-        );
 
         const textX = popupX + 20;
         let textY = popupY + 20;
 
-        context.fillStyle = "black";
-        context.fillRect(
-            popupX-3,
-            popupY-3,
-            popupWidth+6,
-            popupHeight+6
-        );
         context.fillStyle = "white";
         context.fillRect(
             popupX,

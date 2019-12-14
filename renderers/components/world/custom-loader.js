@@ -1,5 +1,3 @@
-const FAKE_OVERWORLD_LOAD_TIME = 500;
-
 function CustomWorldLoader() {
     let ranCustomLoader = false;
     Object.defineProperty(this,"ranCustomLoader",{

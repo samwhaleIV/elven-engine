@@ -36,17 +36,12 @@ function LetterUI(message,callback) {
         }
         yOffset = Math.floor(yOffset * fullHeight);
 
-        const popupWidth = halfWidth > 700 ? halfWidth : fullWidth < 700 ? fullWidth - 20 : 700 - 20;
+        const popupWidth = Math.min(800,fullWidth-20);
         const popupHeight = fullHeight - 20;
+
         const popupY = fullHeight - 10 - popupHeight + yOffset;
+        this.startY = popupY;
         const popupX = Math.round(halfWidth - popupWidth / 2);
-        context.fillStyle = "black";
-        context.fillRect(
-            popupX-3,
-            popupY-3,
-            popupWidth+6,
-            popupHeight+6
-        );
         context.fillStyle = "white";
         context.fillRect(
             popupX,

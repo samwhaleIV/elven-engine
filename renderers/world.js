@@ -232,7 +232,7 @@ function WorldRenderer() {
         }
 
         return {
-            x:x,y:y,width:width,height:height
+            x:x+5,y:y+5,width:width-10,height:height-10
         }
     }
 

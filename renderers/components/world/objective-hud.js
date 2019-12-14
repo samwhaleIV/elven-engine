@@ -1,9 +1,8 @@
 const BOX_MARGIN = 15;
 const DOUBLE_BOX_MARGIN = BOX_MARGIN * 2;
 const TEXT_SCALE = 4;
-const BORDER_WIDTH = 3;
-const VERTICAL_EDGE_MARGIN = 7;
-const LINE_WIDTH = BORDER_WIDTH * 2;
+const BORDER_WIDTH = 0;
+const VERTICAL_EDGE_MARGIN = 10;
 
 const BOX_Y = VERTICAL_EDGE_MARGIN + BORDER_WIDTH;
 const TEXT_Y = VERTICAL_EDGE_MARGIN + BORDER_WIDTH + BOX_MARGIN;
@@ -51,19 +50,12 @@ function ObjectiveHUD(world,description,isNew) {
         const boxX = Math.round(halfWidth - textSize.width / 2 - BOX_MARGIN);
 
         context.fillStyle = "white";
-        context.strokeStyle = "black";
-        context.lineWidth = LINE_WIDTH;
-        
-        context.beginPath();
-        context.rect(
+        context.fillRect(
             boxX,
             BOX_Y,
             textSize.width + DOUBLE_BOX_MARGIN,
             textSize.height + DOUBLE_BOX_MARGIN
         );
-        context.stroke();
-        context.fill();
-
         BitmapText.drawTextBlack(text,boxX + BOX_MARGIN,TEXT_Y,TEXT_SCALE);
     }
 }

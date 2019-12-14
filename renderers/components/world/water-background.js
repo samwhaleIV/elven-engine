@@ -49,6 +49,7 @@ function WaterBackground(
 
         context.fillStyle = pattern;
         context.save();
+        context.beginPath();
         context.rect(0,0,fullWidth,fullHeight);
         context.translate(
             -xOffsetDistance*size + xOffset,
@@ -59,6 +60,7 @@ function WaterBackground(
 
         context.fillStyle = pattern;
         context.save();
+        context.beginPath();
         context.rect(0,0,fullWidth,fullHeight);
         context.translate(
             (offset - cameraXDistance) * size + xOffset,
