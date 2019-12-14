@@ -48,9 +48,9 @@ function WaterBackground(
         const yOffsetDistance = offset + cameraYDistance;
 
         context.fillStyle = pattern;
-        context.save();
         context.beginPath();
         context.rect(0,0,fullWidth,fullHeight);
+        context.save();
         context.translate(
             -xOffsetDistance*size + xOffset,
             -yOffsetDistance*size + yOffset
@@ -60,8 +60,6 @@ function WaterBackground(
 
         context.fillStyle = pattern;
         context.save();
-        context.beginPath();
-        context.rect(0,0,fullWidth,fullHeight);
         context.translate(
             (offset - cameraXDistance) * size + xOffset,
             -cameraYDistance * size + yOffset
@@ -70,6 +68,7 @@ function WaterBackground(
         context.scale(-1,-1);
         context.fill();
         context.restore();
+        context.closePath();
     }
 }
 function GetWaterBackground(
