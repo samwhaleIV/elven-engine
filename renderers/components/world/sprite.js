@@ -158,17 +158,17 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         while(pathIndex < convoyPath.length) {
             const nextPath = convoyPath[pathIndex];
 
-            const xDistance = Math.abs(lastPath.x-nextPath.x,2);
-            const yDistance = Math.abs(lastPath.y-nextPath.y,2);
+            const xDistance = Math.abs(lastPath.x-nextPath.x);
+            const yDistance = Math.abs(lastPath.y-nextPath.y);
 
-            const distance = xDistance || yDistance;
+            const distance = Math.max(xDistance,yDistance);
 
             if(lengthBuffer > distance) {
                 lengthBuffer -= distance;
                 pathIndex++;
                 lastPath = nextPath;
             } else {
-                if(xDistance) {
+                if(xDistance === distance) {
                     return {
                         direction: lastPath.direction,
                         x: lastPath.direction === "left" ? lastPath.x + lengthBuffer : lastPath.x - lengthBuffer,
@@ -185,6 +185,18 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         }
         const finalPath = convoyPath[convoyPath.length-1];
         return finalPath;
+    }
+    this.forceConvoyUpdate = () => {
+        if(!convoyCount) {
+            return;
+        }
+        const calculatedX = this.x + this.xOffset;
+        const calculatedY = this.y + this.yOffset;
+        convoyPath.unshift({
+            direction: this.direction,
+            x: calculatedX,
+            y: calculatedY
+        });
     }
     const renderConvoy = (timestamp,x,y,width,height) => {
         const calculatedX = this.x + this.xOffset;
@@ -227,16 +239,17 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             context.beginPath();
             context.lineWidth = 2;
             context.strokeStyle = "red";
-            context.moveTo(
-                xOffset + x + (convoyPath[0].x - this.x) * width,
-                yOffset + y + (convoyPath[0].y - this.y) * height
-            );
-            for(let i = 1;i<convoyPath.length;i++) {
+            for(let i = 0;i<convoyPath.length;i++) {
                 const path = convoyPath[i];
-                context.lineTo(
-                    xOffset + x + (path.x - this.x) * width,
-                    yOffset + y + (path.y - this.y) * height
-                );
+                const lineX = xOffset + x + (path.x - this.x) * width;
+                const lineY = yOffset + y + (path.y - this.y) * height;
+                if(i === 0) {
+                    context.moveTo(lineX,lineY);
+                } else {
+                    context.lineTo(lineX,lineY);
+                }
+                context.fillStyle = "blue";
+                context.fillRect(lineX-5,lineY-5,10,10);
             } 
             context.stroke();
         }
@@ -289,7 +302,7 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         let upOffsetValue = this.world.getCollisionTile(this.x,lerpYStart);
         let downOffsetValue = this.world.getCollisionTile(this.x,lerpYEnd);
 
-        const adjustedStairHeight = STAIR_HEIGHT - this.renderYOffset;
+        const adjustedStairHeight = STAIR_HEIGHT + this.renderYOffset;
 
         if(leftOffsetValue !== ELEVATION_TILE) {
             leftOffsetValue = 0;
@@ -503,8 +516,8 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
             let renderWidth = width * worldScaleTranslation;
             let renderHeight = customWidthRatio * renderWidth;
 
-            const renderXOffset = (width - renderWidth) / 2 - Math.floor(renderWidth * this.renderXOffset);
-            const renderYOffset = height - renderHeight - Math.floor(renderHeight * this.renderYOffset);
+            const renderXOffset = (width - renderWidth) / 2;
+            const renderYOffset = height - renderHeight;
 
             const destinationX = (this.xOffset * width + x + (this.x - startX) * width) + renderXOffset;
             const destinationY = (this.yOffset * height + y + (this.y - startY) * height) + renderYOffset;
@@ -531,10 +544,8 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         }
     } else {
         this.renderSelf = function(x,y,width,height) {
-            const renderXOffset = Math.floor(width * this.renderXOffset);
-            const renderYOffset = Math.floor(height * this.renderYOffset);
-            const destinationX = this.xOffset * width + x + (this.x - startX) * width - renderXOffset;
-            const destinationY = this.yOffset * height + y + (this.y - startY) * height - renderYOffset;
+            const destinationX = this.xOffset * width + x + (this.x - startX) * width;
+            const destinationY = this.yOffset * height + y + (this.y - startY) * height;
             const animationRow = specialRow !== null ? specialRow : !this.walkingOverride && walking ? 
                 Math.floor(recentTimestamp / this.animationFrameTime) % rowCount * rowHeight
             : 0;
@@ -550,6 +561,8 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         }
     }
     this.render = function(timestamp,x,y,width,height) {
+        x += Math.floor(width * this.renderXOffset);
+        y += Math.floor(height * this.renderYOffset);
         recentTimestamp = timestamp;
         startX = this.x;
         startY = this.y;

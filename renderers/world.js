@@ -26,8 +26,6 @@ const POPUP_TIMEOUT = 250;
 const WALK_AFTER_POPUP_DELAY = 150;
 const DEFAULT_BACKGROUND_COLOR = "black";
 
-const CAMERA_RESOLVE_RATE = 5000;
-
 const NEGATIVE_INFINITY_BUT_NOT_REALLY = -1000000;
 const IS_ZERO_FILTER = value => value === 0;
 
@@ -66,7 +64,6 @@ function WorldRenderer() {
     this.prompt = null;
     let lightingLayerActive = false;
     let playerMovementLocked = false;
-    let lastCameraResolve = null;
 
     let escapeMenuShown = false;
     this.escapeMenuDisabled = false;
@@ -1023,12 +1020,20 @@ function WorldRenderer() {
         cameraYFollowEnabled = false;
     }
 
+    const CAMERA_RESOLVE_RATE = 10000;
+    const RESOLVE_RATE_STEP = 400;
+    const RESOLVE_RATE_MAX = 4;
+    let lastCameraResolve = null;
+
+    let resolveStart;
     const processCameraResolve = timestamp => {
         if(this.cameraResolveX || this.cameraResolveY) {
             if(lastCameraResolve === null) {
                 lastCameraResolve = timestamp;
+                resolveStart = timestamp;
             }
-            const resolveDelta = (timestamp - lastCameraResolve) / CAMERA_RESOLVE_RATE;
+            const resolveRate = Math.min((timestamp-resolveStart)/RESOLVE_RATE_STEP,RESOLVE_RATE_MAX);
+            const resolveDelta = (timestamp - lastCameraResolve) / CAMERA_RESOLVE_RATE * resolveRate;
             lastCameraResolve = timestamp;
             if(this.cameraResolveX < 0) {
                 this.cameraResolveX += resolveDelta;

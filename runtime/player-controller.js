@@ -260,6 +260,7 @@ function PlayerController(world) {
                             world.cameraResolveX -= change;
                             player.xOffset = 0;
                             world.moveObject(player.ID,collisionX,player.y);
+                            player.forceConvoyUpdate();
                         }
                     }
                 }
@@ -279,6 +280,7 @@ function PlayerController(world) {
                             world.cameraResolveY -= change;
                             player.yOffset = 0;
                             world.moveObject(player.ID,player.x,collisionY);
+                            player.forceConvoyUpdate();
                         }
                     }
                 }
