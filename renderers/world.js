@@ -210,10 +210,10 @@ function WorldRenderer() {
 
     this.getItemPreviewBounds = () => {
         const x = 10;
-        const width = fullWidth - 10;
+        const width = fullWidth - 20;
 
         let y = 10;
-        let height = fullHeight - 10;
+        let height = fullHeight - 20;
         
         if(this.popup) {
             if(objectiveHUD) {
