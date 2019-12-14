@@ -19,7 +19,7 @@ function LetterUI(message,callback) {
     this.render = timestamp => {
         let yOffset = 0;
         if(endStart) {
-            const delta = (timestamp - endStart) / TRANSITION_DURATION;
+            const delta = Math.max((timestamp - endStart) / TRANSITION_DURATION,0);
             if(delta > 1) {
                 if(callback) {
                     callback();
@@ -31,7 +31,7 @@ function LetterUI(message,callback) {
             start = timestamp;
             yOffset = -1;
         } else {
-            const delta = Math.min((timestamp - start) / TRANSITION_DURATION,1);
+            const delta = Math.min(Math.max((timestamp - start) / TRANSITION_DURATION,0),1);
             yOffset = 1 - delta;
         }
         yOffset = Math.floor(yOffset * fullHeight);

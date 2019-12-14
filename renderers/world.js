@@ -18,6 +18,7 @@ import MoveSprite from "./components/world/sprite-mover.js";
 import CustomWorldLoader from "./components/world/custom-loader.js";
 import LetterUI from "./components/world/letter-ui.js";
 import ImagePreview from "./components/world/image-preview.js";
+import { TextSound } from "../runtime/tones.js";
 
 const ALERT_TIME = 1000;
 const ANIMATION_FRAME_TIME = ANIMATION_CYCLE_DURATION / ANIMATION_TILE_COUNT;
@@ -448,6 +449,10 @@ function WorldRenderer() {
         });
     }
 
+    this.resetPopupTimeout = () => {
+        lastPopupCleared = NEGATIVE_INFINITY_BUT_NOT_REALLY;
+    }
+
     this.say = text => showPopup([text]);
     this.speech = pages => showPopup(pages);
     this.ask = (question,...options) => this.showPrompt(question,...options);
@@ -459,6 +464,7 @@ function WorldRenderer() {
     this.showNamedPopup =   (page,name) =>  showPopup([page],name);
     this.showNamedPopups =  (pages,name) => showPopup(pages,name);
     this.showInstantPopupSound = page => {
+        this.resetPopupTimeout();
         playSound("energy");
         return showPopup([page],null,true,false);
     }
@@ -477,6 +483,7 @@ function WorldRenderer() {
     this.showLetter = message => {
         return new Promise(resolve => {
             popupActive = true;
+            TextSound();
             this.popup = new LetterUI(message,()=>{
                 popupActive = false;
                 this.popup = null;

@@ -27,7 +27,7 @@ function ObjectiveHUD(world,description,isNew) {
         }
     });
     if(isNew) {
-        world.showInstantPopup("New objective: " + description);
+        world.say("New objective: " + description);
     }
     this.markComplete = async(callback,noShow=false) => {
         if(completed) {
@@ -35,7 +35,7 @@ function ObjectiveHUD(world,description,isNew) {
         }
         completed = true;
         if(!noShow) {
-            await world.showInstantPopup("Objective completed!");
+            await world.say("Objective completed!");
         }
         world.clearObjectiveHUD();
         if(callback) {
