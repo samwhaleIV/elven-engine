@@ -26,10 +26,15 @@ const POPUP_TIMEOUT = 250;
 const WALK_AFTER_POPUP_DELAY = 150;
 const DEFAULT_BACKGROUND_COLOR = "black";
 
+const CAMERA_RESOLVE_RATE = 10000;
+const RESOLVE_RATE_STEP = 400;
+const RESOLVE_RATE_MAX = 4;
+
 const NEGATIVE_INFINITY_BUT_NOT_REALLY = -1000000;
 const IS_ZERO_FILTER = value => value === 0;
 
 const getDefaultCamera = () => {
+    //The default position values have been 10 since the beginning of time and no one really knows why
     return {
         x: 10,
         y: 10,
@@ -86,6 +91,9 @@ function WorldRenderer() {
 
     this.cameraResolveX = 0;
     this.cameraResolveY = 0;
+
+    let lastCameraResolve = null;
+    let resolveStart;
 
     let backgroundColor = DEFAULT_BACKGROUND_COLOR;
 
@@ -1020,12 +1028,6 @@ function WorldRenderer() {
         cameraYFollowEnabled = false;
     }
 
-    const CAMERA_RESOLVE_RATE = 10000;
-    const RESOLVE_RATE_STEP = 400;
-    const RESOLVE_RATE_MAX = 4;
-    let lastCameraResolve = null;
-
-    let resolveStart;
     const processCameraResolve = timestamp => {
         if(this.cameraResolveX || this.cameraResolveY) {
             if(lastCameraResolve === null) {
