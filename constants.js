@@ -136,3 +136,6 @@ function delay(time,...parameters) {
 function getRandomPolarity() {
     return Math.round(Math.random()) * 2 - 1;
 }
+const removeRandomEntry = array => {
+    return array.splice(Math.floor(Math.random()*array.length),1)[0];
+}
