@@ -139,3 +139,6 @@ function getRandomPolarity() {
 const removeRandomEntry = array => {
     return array.splice(Math.floor(Math.random()*array.length),1)[0];
 }
+const selectRandomEntry = array => {
+    return array[Math.floor(Math.random()*array.length)];
+}
