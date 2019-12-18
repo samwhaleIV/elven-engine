@@ -543,7 +543,10 @@ function WorldRenderer() {
                 collisionState.object = null;
             }
         }
-        const collidesWithTile = collisionState.map >= 1 && collisionState.map < SPECIAL_COLLISION_START;
+        const mapValue = collisionState.map;
+        const collidesWithTile = (
+            mapValue >= 1 && mapValue < SPECIAL_COLLISION_START
+        ) || mapValue >= CUSTOM_COLLISION_START;
         const hasObject = collisionState.object ? true : false;
         return collidesWithTile || hasObject;
     }
@@ -819,6 +822,7 @@ function WorldRenderer() {
         tileRenderingEnabled = true;
         this.clearCustomRendererStack();
         this.map = newMap.WorldState ? new newMap.WorldState(this,data):{};
+        this.map.world = this;
         if(newMap.cameraStart) {
             this.camera.x = newMap.cameraStart.x;
             this.camera.y = newMap.cameraStart.y;

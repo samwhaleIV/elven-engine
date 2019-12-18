@@ -72,33 +72,34 @@ function PlayerController(world) {
         const collisionState = this.world.getCollisionState(
             pulseLocation.x,pulseLocation.y,true
         );
-        if(collisionState.object) {
-            if(collisionState.object.interacted) {
-                collisionState.object.interacted(
+        const mapValue = collisionState.map;
+        const objectValue = collisionState.object;
+        if(objectValue) {
+            if(objectValue.interacted) {
+                objectValue.interacted(
                     pulseLocation.x,
                     pulseLocation.y,
                     invertDirection(player.direction)
                 );
             }
-        } else if(collisionState.map) {
-            switch(collisionState.map) {
+        } else if(mapValue) {
+            switch(mapValue) {
                 case 2:
-                    this.world.map.doorClicked(
-                        this.world.renderMap.doorLookup[
-                            pulseLocation.x
-                        ][
-                            pulseLocation.y
-                        ]
+                    const doorIndex = (
+                        this.world.renderMap.doorLookup[pulseLocation.x][pulseLocation.y]
                     );
+                    this.world.map.doorClicked(doorIndex);
                     break;
                 default:
-                    if(collisionState.map < LogicLayerInteractStart) {
+                    if(mapValue < LogicLayerInteractStart ||
+                        (mapValue >= SPECIAL_COLLISION_START && mapValue < CUSTOM_COLLISION_START)
+                    ) {
                         break;
                     }
                     const worldClickedMethod = this.world.map.worldClicked;
                     if(worldClickedMethod) {
                         worldClickedMethod(
-                            collisionState.map,
+                            mapValue,
                             pulseLocation.x,
                             pulseLocation.y,
                             invertDirection(player.direction)
