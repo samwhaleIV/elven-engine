@@ -329,6 +329,12 @@ function stopMusic() {
 }
 
 let lastTone = null;
+function stopTone() {
+    if(lastTone) {
+        lastTone.stop(audioContext.currentTime);
+        lastTone = null;
+    }
+}
 function playTone(frequency,duration) {
     const oscillator = audioContext.createOscillator();
     oscillator.type = "square";
@@ -345,9 +351,7 @@ function playTone(frequency,duration) {
     oscillator.frequency.setValueAtTime(frequency,startTime);
     oscillator.start(startTime);
     oscillator.stop(endTime);
-    if(lastTone) {
-        lastTone.stop(audioContext.currentTime);
-    }
+    stopTone();
     lastTone = oscillator;
 }
 function playTonesScaled(pitchScale,durationScale,timeScale,toneMap) {
@@ -407,6 +411,7 @@ function stopSound(name) {
     }
 }
 function stopAllSounds() {
+    stopTone();
     Object.entries(activeSounds).forEach(stopSoundBucket);
 }
 function generateIntroFromBuffer(bufferName,newIntroName,introLength,loopSwitchZoneLength) {
