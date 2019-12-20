@@ -359,8 +359,24 @@ const sendKeyDown = event => {
     }
     routeKeyEvent(keyCode,keyEventTypes.keyDown);
 };
-window.addEventListener("keydown",sendKeyDown);
-window.addEventListener("keyup",sendKeyUp);
+(function keyRegistration() {
+    const downKeys = {};
+    window.addEventListener("keydown",function(event){
+        downKeys[event.code] = {
+            keyCode: event.keyCode,
+            code: event.code,
+            key: event.key
+        };
+        sendKeyDown.call(null,event);
+    });
+    window.addEventListener("keyup",function(event){
+        delete downKeys[event.code];
+        sendKeyUp.call(null,event);
+    });
+    window.addEventListener("blur",function(){
+        Object.values(downKeys).forEach(sendKeyUp);
+    });
+})();
 window.addEventListener("resize",applySizeMode.bind(this,false));
 
 function createRainbowGradient() {
