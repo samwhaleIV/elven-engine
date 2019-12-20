@@ -11,11 +11,10 @@ function SwapTestRenderer() {
     const colors = [
         "red","orange","blue","green","yellow","magenta","purple","pink"
     ];
-    const randomColor = () => selectRandomEntry(colors);
     const randomPalette = (size=colorCount) => {
         const array = new Array(size);
         for(let i = 0;i<size;i++) {
-            array[i] = randomColor();
+            array[i] = colors.getRandom();
         }
         return array;
     }
@@ -23,12 +22,9 @@ function SwapTestRenderer() {
     for(let i = 0;i<20;i++) {
         palettes.push(randomPalette());
     }
-    const randomSavedPalette = () => selectRandomEntry(palettes);
     (async ()=>{
         while(true) {
-            image = paletteSwap.getSwapped(
-                randomSavedPalette()
-            );
+            image = paletteSwap.getSwapped(palettes.getRandom());
             await delay(150);
         }
     })();

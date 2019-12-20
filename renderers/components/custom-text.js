@@ -198,8 +198,6 @@ function drawTextColor(color,text,x,y,scale) {
     }
 }
 
-const textControlCodesList = Object.entries(textControlCodes);
-
 const processTextForWrapping = function(text) {
     const words = [];
     let bufferWord = "";
@@ -208,7 +206,7 @@ const processTextForWrapping = function(text) {
         const character = text[i];
         switch(character) {
             default:
-                const controlCode = textControlCodes[character];
+                const controlCode = TEXT_CONTROL_CODES[character];
                 if(controlCode) {
                     if(bufferWord) {
                         words.push(bufferWord);
@@ -248,7 +246,7 @@ const textWrapTest = function(words,maxWidth,horizontalSpace,scale) {
     const wrapRequiredTable = new Array(words.length);
     while(i < words.length) {
         const word = words[i];
-        if(textControlCodes[word]) {
+        if(TEXT_CONTROL_CODES[word]) {
             if(word === "\n") {
                 xOffset = 0;
                 wrapRequiredTable[i] = true;
@@ -319,7 +317,7 @@ function drawTextWrapping(words,x,y,maxWidth,horizontalSpace,verticalSpace,scale
     context.beginPath();
     while(i < words.length) {
         const word = words[i];
-        if(textControlCodes[word]) {
+        if(TEXT_CONTROL_CODES[word]) {
             if(word === "\n") {
                 xOffset = 0;
                 yOffset += verticalSpace + drawHeight;
@@ -332,9 +330,7 @@ function drawTextWrapping(words,x,y,maxWidth,horizontalSpace,verticalSpace,scale
                     drawingCustomColor = false;
                 } else {
                     context.fill();
-                    const newColor = textColorLookup[
-                        word
-                    ];
+                    const newColor = TEXT_COLOR_LOOKUP[word];
                     context.fillStyle = newColor ? newColor : rainbowGradient;
                     context.beginPath();
                     drawingCustomColor = true;

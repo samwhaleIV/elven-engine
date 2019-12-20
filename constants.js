@@ -24,8 +24,6 @@ const mediumResolutionAdaptiveTextSpacing = 4;
 const lowResolutionAdaptiveTextScale = 2;
 const lowResolutionAdpativeTextSpacing = 1;
 
-const FAKE_OVERWORLD_LOAD_TIME = 500;
-
 const kc = {
     accept: "k_accept",
     cancel: "k_cancel",
@@ -57,7 +55,7 @@ let leftButtonCode = {code:kc.left};
 let rightButtonCode = {code:kc.right};
 let startButtonCode = {code:kc.accept};
 
-const textControlCodes = {
+const TEXT_CONTROL_CODES = {
     "\n": /\n/g,
     "ȸ": /ȸ/g,
     "ȹ": /ȹ/g,
@@ -71,7 +69,7 @@ const textControlCodes = {
     "ō": /ō/g,
     "φ": /φ/g
 }
-const textColorLookup = {
+const TEXT_COLOR_LOOKUP = {
     "ȸ": "red",
     "ȹ": "green",
     "ȴ": "blue",
@@ -84,23 +82,14 @@ const textColorLookup = {
     "ō": "white",
     "ɍ": 0
 }
-const inverseTextColorLookup = (function(){
+const TextColors = (function(){
     const inverse = {};
-    Object.entries(textColorLookup).forEach(entry => {
+    Object.entries(TEXT_COLOR_LOOKUP).forEach(entry => {
         inverse[entry[1]] = entry[0];
     });
     return inverse;
 })();
-const popupControlCharacters = {
-    "-": true,
-    " ": true,
-    ",": true,
-    ".": true,
-    "?": true,
-    "!": true,
-    " ": true
-}
-popupControlCharacters[ellipsis] = true;
+
 const IMAGE_TO_BITMAP_SETTINGS = {
     imageOrientation: "none",
     //Premultiply has no observed performance changes
@@ -113,9 +102,6 @@ const MUSIC_FILE_FORMAT = ENV_FLAGS.MUSIC_FILE_FORMAT || "ogg";
 const ERROR_IMAGE = "error";
 const TRIGGER_ACTIVATED = Symbol("TRIGGER_ACTIVATED");
 
-function lerp(v0,v1,t) {
-    return v0*(1-t)+v1*t
-}
 const invertDirection = direction => {
     switch(direction) {
         case "up":
@@ -130,15 +116,32 @@ const invertDirection = direction => {
             return direction;
     }
 }
+const FAKE_OVERWORLD_LOAD_TIME = 500;
+
 function delay(time,...parameters) {
+    //Delay.. For the girls tired of waiting.
     return new Promise(resolve=>setTimeout(resolve,time,...parameters));
 }
-function getRandomPolarity() {
+
+/*
+   Why are we changing default objects?
+   Because writing these four specific functions
+   again any time in the rest of my life is not worth it.
+   Choke on a dick.
+*/
+Math.lerp = function(v0,v1,t) {
+    /*
+      Lifted straight from https://en.wikipedia.org/wiki/Linear_interpolation
+      I care enough to cite this, but not enough to write it myself.
+    */
+    return (1 - t) * v0 + t * v1;
+}
+Math.randomPolarity = function() {
     return Math.round(Math.random()) * 2 - 1;
 }
-const removeRandomEntry = array => {
-    return array.splice(Math.floor(Math.random()*array.length),1)[0];
+Array.prototype.popRandom = function() {
+    return this.splice(Math.floor(Math.random()*this.length),1)[0];
 }
-const selectRandomEntry = array => {
-    return array[Math.floor(Math.random()*array.length)];
+Array.prototype.getRandom = function() {
+    return this[Math.floor(Math.random()*this.length)];
 }

@@ -1,7 +1,7 @@
-const CharacterSpriteLookup = GameCharacterData.SpriteLookup || {};
-const CharacterDisplayNames = GameCharacterData.DisplayNames || {};
-const CharacterColors = GameCharacterData.Colors || {};
-const CharacterMakers = GameCharacterData.Makers || {};
+const CharacterSpriteLookup = CHARACTER_DATA.SpriteLookup || {};
+const CharacterDisplayNames = CHARACTER_DATA.DisplayNames || {};
+const CharacterColors = CHARACTER_DATA.Colors || {};
+const CharacterMakers = CHARACTER_DATA.Makers || {};
 
 const typeNameLookup = {
     "elf": ElfCharacterMaker,
@@ -12,7 +12,7 @@ function AddMakerType(typeName,maker) {
     typeNameLookup[typeName] = maker;
 }
 const ColorLookup = {};
-Object.entries(textColorLookup).forEach(entry => {
+Object.entries(TEXT_COLOR_LOOKUP).forEach(entry => {
     ColorLookup[entry[1]] = entry[0];
 });
 delete ColorLookup[0];

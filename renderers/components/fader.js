@@ -224,12 +224,13 @@ function getFader() {
                                 if(name === rendererState.song) {
                                     const fancyEncodingData = rendererState.fancyEncodingData;
                                     if(rendererState.fancyEncodingData) {
+                                        const introName = name + MUSIC_INTRO_SUFFIX;
                                         generateIntroFromBuffer(
-                                            name,fancyEncodingData.introName,
+                                            name,introName,
                                             fancyEncodingData.introLength,
                                             fancyEncodingData.switchZoneLength
                                         );
-                                        rendererState.songIntro = fancyEncodingData.introName;
+                                        rendererState.songIntro = introName;
                                     }
                                     fadeInCompleter();
                                     audioBufferAddedCallback = null;

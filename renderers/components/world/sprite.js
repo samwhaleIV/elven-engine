@@ -327,16 +327,16 @@ function SpriteRenderer(startDirection,spriteName,customColumnWidth,customColumn
         let offset = 0;
 
         if(this.xOffset >= 0) {
-            offset = lerp(leftOffsetValue,rightOffsetValue,this.xOffset);
+            offset = Math.lerp(leftOffsetValue,rightOffsetValue,this.xOffset);
         } else {
-            offset = lerp(rightOffsetValue,leftOffsetValue,-this.xOffset);
+            offset = Math.lerp(rightOffsetValue,leftOffsetValue,-this.xOffset);
         }
         
         if(downOffsetValue !== upOffsetValue) {
             if(this.yOffset > 0) {
-                offset = lerp(upOffsetValue,downOffsetValue,this.yOffset);
+                offset = Math.lerp(upOffsetValue,downOffsetValue,this.yOffset);
             } else {
-                offset = lerp(downOffsetValue,upOffsetValue,-this.yOffset);
+                offset = Math.lerp(downOffsetValue,upOffsetValue,-this.yOffset);
             }
         }
         return offset;

@@ -64,7 +64,6 @@ function WorldRenderer() {
     let cameraYFollowEnabled = true;
     let backgroundRenderer = null;
     let lightTable;
-    let refreshLightTable;
     this.popup = null;
     this.prompt = null;
     let lightingLayerActive = false;
@@ -111,10 +110,10 @@ function WorldRenderer() {
     let tileRenderingEnabled = true;
     this.decals = [];
 
-    (function(){
+    const refreshLightTable = (function(){
         const references = GetLightTableReferences();
         lightTable = references.table;
-        refreshLightTable = references.updateSize;
+        return references.updateSize;
     })();
 
     this.tileSprite = PsuedoSpriteWrapper(this,TileSprite);
@@ -1033,7 +1032,7 @@ function WorldRenderer() {
     }
 
     const processCameraResolve = timestamp => {
-        if(this.cameraResolveX || this.cameraResolveY) {
+        if(this.cameraResolveX !== 0 || this.cameraResolveY !== 0) {
             if(lastCameraResolve === null) {
                 lastCameraResolve = timestamp;
                 resolveStart = timestamp;
@@ -1096,8 +1095,8 @@ function WorldRenderer() {
                     followObject.walkingOverride = movementLocked;
                 }
             }
+            processCameraResolve(timestamp);
         }
-        processCameraResolve(timestamp);
         if(this.renderMap.useCameraPadding) {
             const abolsuteCameraX = this.camera.x + this.camera.xOffset;
             const absoluteCameraY = this.camera.y + this.camera.yOffset;

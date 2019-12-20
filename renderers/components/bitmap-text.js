@@ -10,17 +10,17 @@ const BitmapText = new (function(){
         "white": 1,
         "black": 0
     };
-    colorToRow[inverseTextColorLookup["red"]] = 2;
-    colorToRow[inverseTextColorLookup["blue"]] = 3;
-    colorToRow[inverseTextColorLookup["green"]] = 5;
-    colorToRow[inverseTextColorLookup["goldenrod"]] = 4;
-    colorToRow[inverseTextColorLookup["blueviolet"]] = 6;
-    colorToRow[inverseTextColorLookup["darkorange"]] = 8;
-    colorToRow[inverseTextColorLookup["deeppink"]] = 7;
-    colorToRow[inverseTextColorLookup["cyan"]] = 9;
+    colorToRow[TextColors["red"]] = 2;
+    colorToRow[TextColors["blue"]] = 3;
+    colorToRow[TextColors["green"]] = 5;
+    colorToRow[TextColors["goldenrod"]] = 4;
+    colorToRow[TextColors["blueviolet"]] = 6;
+    colorToRow[TextColors["darkorange"]] = 8;
+    colorToRow[TextColors["deeppink"]] = 7;
+    colorToRow[TextColors["cyan"]] = 9;
 
-    colorToRow[inverseTextColorLookup["black"]] = 0;
-    colorToRow[inverseTextColorLookup["white"]] = 1;
+    colorToRow[TextColors["black"]] = 0;
+    colorToRow[TextColors["white"]] = 1;
 
     this.verifyBitmap = () => {
         bitmap = imageDictionary["elven-font"];
@@ -34,7 +34,7 @@ const BitmapText = new (function(){
         const wrapRequiredTable = new Array(words.length);
         while(i<words.length) {
             const word = words[i];
-            if(textControlCodes[word]) {
+            if(TEXT_CONTROL_CODES[word]) {
                 if(word === "\n") {
                     wrapRequiredTable[i] = true;
                     xOffset = 0;
@@ -104,7 +104,7 @@ const BitmapText = new (function(){
         let isNewLine = true;
         while(i < words.length) {
             const word = words[i];
-            if(textControlCodes[word]) {
+            if(TEXT_CONTROL_CODES[word]) {
                 if(word === "\n") {
                     xOffset = 0;
                     yOffset += lineHeight;

@@ -104,7 +104,7 @@ function CustomWorldLoader() {
             requiredSongs.forEach(song => {
                 const introSong = SONG_INTRO_LOOKUP[song];
                 if(introSong) {
-                    requiredSongs.push(introSong);
+                    requiredSongs.push(song + MUSIC_INTRO_SUFFIX);
                 }
             });
             const totalSongs = requiredSongs.length;

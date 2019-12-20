@@ -6,5 +6,7 @@ const EssentialSounds = [
 const NonEssentialSounds = [];
 const ImagePaths = [
     getFile("elven-font.png",FileTypes.Image,false),
-    getFile("error.png",FileTypes.Image,false)
+    getFile("error.png",FileTypes.Image,false),
+    getFile("grade-test.png",FileTypes.Image,false),
+    getFile("swap-test.png",FileTypes.Image,false)
 ];

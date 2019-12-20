@@ -6,10 +6,11 @@ function WorldSongController() {
     }
     this.playSong = songName => {
         const playingSongFull = musicNodes[songName];
-        const introName = SONG_INTRO_LOOKUP[songName];
+        let intro = SONG_INTRO_LOOKUP[songName];
         let playingIntro = false;
-        if(introName) {
-            playingIntro = musicNodes[introName] ? true : false;
+        if(intro) {
+            intro = songName + MUSIC_INTRO_SUFFIX;
+            playingIntro = musicNodes[intro] ? true : false;
         }
         if(!playingIntro && !playingSongFull) {
             let didRunCustomLoader = this.ranCustomLoader;
@@ -35,16 +36,17 @@ function WorldSongController() {
                     }
                 }
                 const enter_sandman = songName => {
-                    const intro = SONG_INTRO_LOOKUP[songName];
+                    let intro = SONG_INTRO_LOOKUP[songName];
                     if(intro && audioBuffers[intro]) {
+                        intro = songName + MUSIC_INTRO_SUFFIX;
                         songIntro = intro;
                         playMusicWithIntro(songName,intro);
                     } else {
-                        const fancyEncodingData = SongsWithTheNewFancyIntroEncoding[songName];
+                        const fancyEncodingData = FANCY_INTRO_SONGS[songName];
                         if(fancyEncodingData) {
                             const introName = songName + MUSIC_INTRO_SUFFIX;
                             generateIntroFromBuffer(
-                                songName,fancyEncodingData.introName,
+                                songName,introName,
                                 fancyEncodingData.introLength,
                                 fancyEncodingData.switchZoneLength
                             );
