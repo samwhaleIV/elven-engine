@@ -16,10 +16,17 @@ const heightByWidth = internalHeight / internalWidth;
 let widthByHeight = internalWidth / internalHeight;
 
 const backgroundCanvas = document.getElementById("background-canvas");
-const context = canvas.getContext("2d",{
-    alpha: ENV_FLAGS.GLOBAL_CONTEXT_ALPHA ? true : false,
-    desynchronized: false
-});
+
+const USE_GLOBAL_ALPHA = ENV_FLAGS.GLOBAL_CONTEXT_ALPHA ? true : false;
+const USE_FRAME_BUFFER = ENV_FLAGS.NO_FRAME_BUFFER ? false : true;
+
+const getContextSettings = () => {
+    return {
+        alpha: USE_GLOBAL_ALPHA,
+        desynchronized: false
+    };
+};
+const context = canvas.getContext("2d",getContextSettings());
 const backgroundContext = backgroundCanvas.getContext("2d",{
     alpha: false,
     desynchronized: false
@@ -595,28 +602,49 @@ function cycleSizeMode() {
     localStorage.setItem(SIZE_MODE_KEY,newMode);
     console.log(`Canvas handler: Set size mode to '${newMode}'`);
 }
-const renderGamepads = function() {
+const isValidGamepad = gamepad => {
+    return gamepad && gamepad.mapping === "standard";
+};
+const renderGamepads = timestamp => {
     const gamepads = navigator.getGamepads();
-    let i = 0;
-    while(i < gamepads.length) {
-        if(gamepads[i] && gamepads[i].mapping === "standard") {
-            processGamepad(gamepads[i],timestamp);
-            i = gamepads.length;
+    for(let i = 0;i < gamepads.length;i++) {
+        const gamepad = gamepads[i];
+        if(isValidGamepad(gamepad)) {
+            processGamepad(gamepad,timestamp);
+            break;
         }
-        i++;
     }
+};
+let bufferCanvas = null;
+let bufferContext = null;
+if(USE_FRAME_BUFFER) {
+    bufferCanvas = new OffscreenCanvas(0,0);
+    bufferContext = bufferCanvas.getContext(
+        "2d",getContextSettings()
+    );
 }
+const updateBufferContext = () => {
+    bufferCanvas.width = canvas.width;
+    bufferCanvas.height = canvas.height;
+    bufferContext.drawImage(canvas,0,0);
+};
+const renderBufferContext = () => {
+    if(USE_FRAME_BUFFER) {
+        context.drawImage(bufferCanvas,0,0);
+    }
+};
 const render = (function(){
     const evaluatedRenderMethod = Function("timestamp",
         `"use strict";animationFrame = window.requestAnimationFrame(render);
         ${!ENV_FLAGS.STATIC_BACKGROUND?"backgroundContext.fillRect(0,0,1,1);":""}
         if(!paused) {
+            ${USE_FRAME_BUFFER?"updateBufferContext()":""};
             canvas.width = fullWidth;
             canvas.height = fullHeight;
             context.imageSmoothingEnabled = false;
             rendererState.render(timestamp);
             rendererState.fader.render(timestamp);
-            ${!ENV_FLAGS.CONTROLLER_DISABLED?"renderGamepads":""}
+            ${!ENV_FLAGS.CONTROLLER_DISABLED?"renderGamepads(timestamp);":""}
         }`);
     return evaluatedRenderMethod;
 })();
@@ -690,7 +718,10 @@ function setRendererState(newRendererState) {
         altPointerEventMode = pointerEventModes.none;
     }
 }
-function pauseRenderer() {
+function pauseRenderer(doNotRenderBufferContext=false) {
+    if(USE_FRAME_BUFFER && !doNotRenderBufferContext) {
+        renderBufferContext();
+    }
     paused = true;
     console.log("Canvas handler: Paused renderer");
 }
@@ -707,10 +738,13 @@ function forceRender() {
     window.cancelAnimationFrame(animationFrame);
     render(performance.now());
 }
-function debugOffscreenCanvas(canvas) {
+function saveOffscreenCanvas(canvas) {
     canvas.convertToBlob({
         type: "image/png"
     }).then(function(blob) {
         window.open(URL.createObjectURL(blob));
     });
+}
+function saveBufferCanvas() {
+    return saveOffscreenCanvas(bufferCanvas);
 }

@@ -133,7 +133,7 @@ function getFader() {
             console.log("Transition complete");
         },
         onoutEnd: () => {
-            pauseRenderer();
+            pauseRenderer(true);
             let fadeInDelay = rendererState.fader.fadeInDelay;
             const startTime = performance.now();
             const fadeInCompleter = () => {

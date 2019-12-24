@@ -1,8 +1,14 @@
 const gamepadDeadzone = 0.5;
 const deadzoneNormalizer = 1 / (1 - gamepadDeadzone);
+const fakeButtonPressEvent = {
+    pressed: true
+};
+const buttonStates = {}
+const buttonRollverTimeout = 150;
+const axisRolloverTimeout = 180;
+const firstPressRepeatDelay = 400;
+const firstPressRepeatDelayAxis = 200;
 
-const fakeButtonPressEvent = {pressed:true};
-const buttonStates = {}, buttonRollverTimeout = 150, axisRolloverTimeout = 180, firstPressRepeatDelay = 400, firstPressRepeatDelayAxis = 200;
 function applyDeadZone(value) {
     if(value < 0) {
         value = value + gamepadDeadzone;
