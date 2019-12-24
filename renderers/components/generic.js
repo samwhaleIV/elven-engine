@@ -1,3 +1,5 @@
+//Fuck this file and everything it stands for.. Except contains and areaContains. You two are okay, I guess.
+
 function drawRectangle(rectangle,color) {
     context.fillStyle = color;
     context.fillRect(
