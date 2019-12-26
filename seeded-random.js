@@ -165,4 +165,4 @@ const InstallSeededRandom = (function InstallationWrapper({autoInstall=false}){
     }
 
     return SafeRandomInstaller;
-})({autoInstall: true||ENV_FLAGS.INSTALL_SEEDED_RANDOM});
+})({autoInstall: ENV_FLAGS.INSTALL_SEEDED_RANDOM});
