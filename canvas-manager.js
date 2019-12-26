@@ -640,7 +640,17 @@ const tryUpdateBufferContext = () => {
     if(USE_FRAME_BUFFER) {
         updateBufferContext();
     }
-}
+};
+const clearContext = color => {
+    if(color) {
+        context.fillStyle = color;
+    }
+    context.fillRect(0,0,fullWidth,fullHeight);
+    tryUpdateBufferContext();
+};
+const getContextClearer = (color="black") => {
+    return clearContext.bind(null,color);
+};
 const render = (function(){
     const evaluatedRenderMethod = Function("timestamp",
         `"use strict";animationFrame = window.requestAnimationFrame(render);
