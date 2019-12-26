@@ -9,7 +9,7 @@ const InstallSeededRandom = (function InstallationWrapper({autoInstall=false}){
     const DEFUALT_SEED_METHOD = function seedGenerator(seed) {
         seed = seed + max;
         seed = ((seed * max / magic) % max + seed) % max - max;
-        return Math.trunc(Math.lerp(-max,max,-seed/max));
+        return Math.round(Math.lerp(-max,max,-seed/max));
     };
 
     const SEED_TEST = function(method,startSeed=0,testSize=10000) {
