@@ -3,9 +3,33 @@ const InstallSeededRandom = (function InstallationWrapper({autoInstall=false}){
     const ALREADY_INSTALLED = "Cannot install seeded random. Seeded random is already installed into 'Math' object";
     const BAD_SEED = value => `Value (${value}) could not be parsed into type 'number'`;
 
-    const max = Math.pow(2,53) - 1;
-    const range = max * 2;
+    /*
+        m = 2^53 - 1  (Half range)
+        n = 2^31 - 1  (Magic/Seed)
+        r = m * 2     (Range)
+
+        Formula:
+        i -> m + ((((m + i) * m / n) % m + i + m) % m - m) / m * r
+
+        Explanation:
+        Extend seed values far beyond the safe integer range
+        of JavaScript (2^53 - 1) to rely on
+        floating point error to produce
+        deterministic drifting of seed values.
+        Then, perform a linear interpolation to
+        map the values back to the seeded range.
+
+        There is one constant that requires a large
+        value to enforce a uniform distrubtion.
+        A mersenne prime (2^31 - 1) has been chosen
+        because it is of the same forumla of the range value,
+        and due to the properties of being prime.
+        However, this is not necessarily rquired.
+    */
+
     const magic = Math.pow(2,31) - 1;
+    const max =   Math.pow(2,53) - 1;
+    const range = max * 2;
 
     const DEFAULT_SEED_METHOD = seed => {
         seed = max + seed;
