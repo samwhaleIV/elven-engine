@@ -4,12 +4,13 @@ const InstallSeededRandom = (function InstallationWrapper({autoInstall=false}){
     const BAD_SEED = value => `Value (${value}) could not be parsed into type 'number'`;
 
     const max = Math.pow(2,53) - 1;
+    const range = max * 2;
     const magic = Math.pow(2,31) - 1;
 
-    const DEFUALT_SEED_METHOD = function seedGenerator(seed) {
-        seed = seed + max;
+    const DEFAULT_SEED_METHOD = seed => {
+        seed = max + seed;
         seed = ((seed * max / magic) % max + seed) % max - max;
-        return Math.round(Math.lerp(-max,max,-seed/max));
+        return max + seed / max * range;
     };
 
     const SEED_TEST = function(method,startSeed=0,testSize=10000) {
@@ -31,7 +32,7 @@ const InstallSeededRandom = (function InstallationWrapper({autoInstall=false}){
         installed = true;
 
         if(seedMethod === undefined) {
-            seedMethod = DEFUALT_SEED_METHOD;
+            seedMethod = DEFAULT_SEED_METHOD;
         }
 
         const max = Number.MAX_SAFE_INTEGER;
@@ -77,13 +78,18 @@ const InstallSeededRandom = (function InstallationWrapper({autoInstall=false}){
                     }
                 },
                 seedTest: {
-                    value: function(count) {
+                    value: function(count,testSeed) {
                         console.warn("Seed testing is not for production uses!");
-                        const results = SEED_TEST(seedGenerator,unfloatify(pureRandom()),count);
+
+                        testSeed = testSeed !== undefined ? testSeed : seed;
+                        const results = SEED_TEST(
+                            seedGenerator,testSeed,count
+                        );
+
                         const values = results.map(floatify);
                         let largestIndex = null;
                         let smallestIndex = null;
-                        console.log({
+                        const testResults = {
                             largest: values.reduce((oldValue,newValue,index)=>{
                                 if(newValue > oldValue) {
                                     largestIndex = index;
@@ -103,11 +109,15 @@ const InstallSeededRandom = (function InstallationWrapper({autoInstall=false}){
                             average: values.reduce((oldValue,newValue)=>{
                                 return oldValue + newValue;
                             }) / values.length,
-                            values: values,
-                            largestSeed: largestIndex,
-                            smallestIndex, smallestIndex,
-                            results: results
-                        });
+                            raw: {
+                                values: values,
+                                largestSeed: largestIndex,
+                                smallestIndex, smallestIndex,
+                                results: results
+                            }
+                        };
+
+                        return testResults;
                     },
                     writable: false
                 },
@@ -155,4 +165,4 @@ const InstallSeededRandom = (function InstallationWrapper({autoInstall=false}){
     }
 
     return SafeRandomInstaller;
-})({autoInstall: ENV_FLAGS.INSTALL_SEEDED_RANDOM ? true : false});
+})({autoInstall: true||ENV_FLAGS.INSTALL_SEEDED_RANDOM});
