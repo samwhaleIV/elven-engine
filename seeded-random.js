@@ -1,16 +1,30 @@
-const InstallSeededRandom = (function InstallationWrapper(){
+const InstallSeededRandom = (function InstallationWrapper({autoInstall=false}){
 
     const ALREADY_INSTALLED = "Cannot install seeded random. Seeded random is already installed into 'Math' object";
     const BAD_SEED = value => `Value (${value}) could not be parsed into type 'number'`;
 
+    const max = Math.pow(2,53) - 1;
+    const magic = Math.pow(2,31) - 1;
+
     const DEFUALT_SEED_METHOD = function seedGenerator(seed) {
-        //Todo
-        return seed;
+        seed = seed + max;
+        seed = ((seed * max / magic) % max + seed) % max - max;
+        return Math.trunc(Math.lerp(-max,max,-seed/max));
+    };
+
+    const SEED_TEST = function(method,startSeed=0,testSize=10000) {
+        let values = new Array(testSize);
+        let seed = startSeed;
+        for(let i = 0;i<testSize;i++) {
+            seed = method.call(null,seed);
+            values[i] = seed;
+        }
+        return values;
     };
 
     let installed = false;
 
-    return function SafeRandomInstaller(seedMethod) {
+    function SafeRandomInstaller(seedMethod) {
         if(installed) {
             throw Error(ALREADY_INSTALLED);
         }
@@ -28,8 +42,10 @@ const InstallSeededRandom = (function InstallationWrapper(){
             const pureRandom = Math.random;
 
             let randomMethod = pureRandom;
-            let seed = unfloatify(pureRandom.call());
-            const updateSeedValue = value => seed = value;
+            let seed = 0;
+            const updateSeedValue = value => {
+                seed = value;
+            };
 
             const seedGenerator = seedMethod;
             const seedRandom = () => {
@@ -38,9 +54,15 @@ const InstallSeededRandom = (function InstallationWrapper(){
                 return floatify(result);
             };
 
-            const applyPureRandom = () => randomMethod = applyPureRandom;
-            const applySeededRandom = () => randomMethod = seedRandom;
-            const getRandom = () => randomMethod.call();
+            const applyPureRandom = () => {
+                randomMethod = pureRandom;
+            };
+            const applySeededRandom = () => {
+                randomMethod = seedRandom;
+            };
+            const getRandom = () => {
+                return randomMethod.call();
+            };
 
             return Object.defineProperties(function randomMethodRouter(){
                 return getRandom();
@@ -54,16 +76,62 @@ const InstallSeededRandom = (function InstallationWrapper(){
                         }
                     }
                 },
-                purify: {
-                    value: function purify() {
-                        applyPureRandom();
+                seedTest: {
+                    value: function(count) {
+                        console.warn("Seed testing is not for production uses!");
+                        const results = SEED_TEST(seedGenerator,unfloatify(pureRandom()),count);
+                        const values = results.map(floatify);
+                        let largestIndex = null;
+                        let smallestIndex = null;
+                        console.log({
+                            largest: values.reduce((oldValue,newValue,index)=>{
+                                if(newValue > oldValue) {
+                                    largestIndex = index;
+                                    return newValue;
+                                } else {
+                                    return oldValue;
+                                }
+                            }),
+                            smallest: values.reduce((oldValue,newValue,index)=>{
+                                if(newValue < oldValue) {
+                                    smallestIndex = index;
+                                    return newValue;
+                                } else {
+                                    return oldValue;
+                                }
+                            }),
+                            average: values.reduce((oldValue,newValue)=>{
+                                return oldValue + newValue;
+                            }) / values.length,
+                            values: values,
+                            largestSeed: largestIndex,
+                            smallestIndex, smallestIndex,
+                            results: results
+                        });
                     },
                     writable: false
                 },
-                seedify: {
-                    value: function seedify() {
-                        applySeededRandom();
+                generateSeed: {
+                    value: function updateSeedWithPure() {
+                        updateSeedValue(unfloatify(pureRandom.call()));
+                        return seed;
                     },
+                    writable: false
+                },
+                getSeeded: {
+                    value: seedGenerator,
+                    writable: false
+                },
+                getPure: {
+                    value: pureRandom,
+                    writable: false
+                },
+                purify: {
+                    value: applyPureRandom,
+                    writable: false
+                },
+                seedify: {
+                    value: applySeededRandom,
                     writable: false
                 },
                 seed: {
@@ -81,4 +149,10 @@ const InstallSeededRandom = (function InstallationWrapper(){
             });
         })();
     }
-})();
+
+    if(autoInstall) {
+        SafeRandomInstaller();
+    }
+
+    return SafeRandomInstaller;
+})({autoInstall: ENV_FLAGS.INSTALL_SEEDED_RANDOM ? true : false});

@@ -629,16 +629,24 @@ const updateBufferContext = () => {
     bufferContext.drawImage(canvas,0,0);
 };
 const renderBufferContext = () => {
+    context.drawImage(bufferCanvas,0,0);
+};
+const tryRenderBufferContext = () => {
     if(USE_FRAME_BUFFER) {
-        context.drawImage(bufferCanvas,0,0);
+        renderBufferContext();
     }
 };
+const tryUpdateBufferContext = () => {
+    if(USE_FRAME_BUFFER) {
+        updateBufferContext();
+    }
+}
 const render = (function(){
     const evaluatedRenderMethod = Function("timestamp",
         `"use strict";animationFrame = window.requestAnimationFrame(render);
         ${!ENV_FLAGS.STATIC_BACKGROUND?"backgroundContext.fillRect(0,0,1,1);":""}
         if(!paused) {
-            ${USE_FRAME_BUFFER?"updateBufferContext()":""};
+            ${USE_FRAME_BUFFER?"updateBufferContext();":""};
             canvas.width = fullWidth;
             canvas.height = fullHeight;
             context.imageSmoothingEnabled = false;
