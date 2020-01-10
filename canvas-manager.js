@@ -381,7 +381,10 @@ const sendKeyDown = event => {
         sendKeyUp.call(null,event);
     });
     window.addEventListener("blur",function(){
-        Object.values(downKeys).forEach(sendKeyUp);
+        Object.values(downKeys).forEach(event => {
+            delete downKeys[event.code];
+            sendKeyUp.call(null,event);
+        });
     });
 })();
 window.addEventListener("resize",applySizeMode.bind(this,false));
