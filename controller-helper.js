@@ -11,14 +11,14 @@ const firstPressRepeatDelayAxis = 200;
 
 function applyDeadZone(value) {
     if(value < 0) {
-        value = value + gamepadDeadzone;
+        value += gamepadDeadzone;
         if(value > 0) {
             value = 0;
         } else {
             value *= deadzoneNormalizer;
         }
     } else {
-        value = value - gamepadDeadzone;
+        value -= gamepadDeadzone;
         if(value < 0) {
             value = 0;
         } else {
